@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:leafmusic_2/models/album.dart';
 
 class AlbumList extends StatelessWidget {
-  const AlbumList({super.key});
+  final List<Album> albums;
+
+  const AlbumList({super.key, required this.albums});
 
   @override
   Widget build(BuildContext context) {
@@ -9,44 +12,65 @@ class AlbumList extends StatelessWidget {
       height: 250,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: 5,
+        itemCount: albums.length, // Hiển thị đúng số album
         padding: const EdgeInsets.symmetric(horizontal: 10),
         separatorBuilder: (context, index) => const SizedBox(width: 10),
         itemBuilder: (context, index) {
-          return _buildHorizontalItem(index);
+          return _buildHorizontalItem(context, albums[index]);
         },
       ),
     );
   }
 
-  Widget _buildHorizontalItem(int index) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 150,
-          height: 200,
-          decoration: BoxDecoration(
-            color: Colors.blueAccent,
-            borderRadius: BorderRadius.circular(10),
+  Widget _buildHorizontalItem(BuildContext context, Album album) {
+    return Material(
+      color: Colors.transparent, // Không có nền mặc định
+      child: InkWell(
+        onTap: () {
+          print("Bạn đã nhấn vào album: ${album.name}");
+        },
+        borderRadius: BorderRadius.circular(10),
+        splashColor: Colors.blue.withOpacity(0.3), // Hiệu ứng khi nhấn
+        child: Padding(
+          padding: EdgeInsets.all(8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  album.imageUrl,
+                  width: 150,
+                  height: 200,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/default_song_image.png',
+                      width: 150,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: 8),
+              SizedBox(
+                width: 150,
+                child: Text(
+                  album.name,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
-          padding: const EdgeInsets.all(10),
-          child: const Icon(Icons.album, size: 60, color: Colors.white),
         ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: 150,
-          child: Text(
-            "Album $index",
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

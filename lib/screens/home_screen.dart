@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:leafmusic_2/custom/main_layout.dart';
+import 'package:leafmusic_2/models/album.dart';
 import 'package:leafmusic_2/widgets/song_list.dart';
 import 'package:leafmusic_2/widgets/artist_list.dart';
 import 'package:leafmusic_2/widgets/album_list.dart';
@@ -18,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Song> songs = [];
   List<Artist> artists = [];
+  List<Album> albums = [];
   bool isLoading = true;
   bool hasError = false;
 
@@ -34,13 +36,14 @@ class _HomeScreenState extends State<HomeScreen> {
         hasError = false;
       });
 
-      // Gọi API để lấy dữ liệu
       List<Song> fetchedSongs = await ApiService.fetchSongs();
       List<Artist> fetchedArtists = await ApiService.fetchArtists();
+      List<Album> fetchedAlbums = await ApiService.featchAlbum();
 
       setState(() {
         songs = fetchedSongs;
         artists = fetchedArtists;
+        albums = fetchedAlbums;
         isLoading = false;
       });
     } catch (e) {
@@ -65,16 +68,16 @@ class _HomeScreenState extends State<HomeScreen> {
             RefreshIndicator(
               onRefresh: loadData,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(8.0),
-                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.all(8.0),
+                physics: AlwaysScrollableScrollPhysics(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-                    const SectionTitle(title: "Bài hát đề xuất"),
+                    SectionTitle(title: "Bài hát đề xuất"),
 
                     if (hasError)
-                      const Center(
+                      Center(
                         child: Padding(
                           padding: EdgeInsets.all(16.0),
                           child: Text("Lỗi tải dữ liệu", style: TextStyle(color: Colors.red)),
@@ -83,21 +86,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     else
                       SongList(songs: songs),
 
-                    const SizedBox(height: 10),
-                    const SectionTitle(title: "Top ca sĩ"),
+                    SizedBox(height: 10),
+                    SectionTitle(title: "Top ca sĩ"),
                     if (artists.isEmpty)
-                      const Center(
+                      Center(
                         child: Padding(
                           padding: EdgeInsets.all(16.0),
-                          child: Text("Không có dữ liệu nghệ sĩ"),
+                          child: Text("Lỗi tải dữ liệu", style: TextStyle(color: Colors.red)),
                         ),
                       )
                     else
                       ArtistList(artists: artists),
 
-                    const SizedBox(height: 10),
-                    const SectionTitle(title: "Album nổi bật"),
-                    const AlbumList(),
+                    SizedBox(height: 10),
+                    SectionTitle(title: "Album nổi bật"),
+                    if (albums.isEmpty)
+                      Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text("Lỗi tải dữ liệu", style: TextStyle(color: Colors.red)),
+                        ),
+                      )
+                    else
+                      AlbumList(albums: albums),
+
                   ],
                 ),
               ),
@@ -105,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
             if (isLoading)
               Container(
                 color: Colors.black.withOpacity(0.5),
-                child: const Center(
+                child: Center(
                   child: CircularProgressIndicator(),
                 ),
               ),
@@ -119,16 +131,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Xác nhận thoát"),
-        content: const Text("Bạn có chắc chắn muốn thoát ứng dụng không?"),
+        title: Text("Xác nhận thoát"),
+        content: Text("Bạn có chắc chắn muốn thoát ứng dụng không?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text("Không"),
+            child: Text("Không"),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text("Có"),
+            child: Text("Có"),
           ),
         ],
       ),
