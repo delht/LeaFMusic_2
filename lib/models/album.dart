@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Album {
   final int idAlbum;
   final String name;
@@ -23,6 +25,10 @@ class Album {
           : DateTime(2000, 1, 1),
       idArtist: json['idArtist'] ?? "No data",
     );
+  }
+
+  String get formattedReleaseDate {
+    return DateFormat('dd/MM/yyyy').format(releaseDate);
   }
 
   @override

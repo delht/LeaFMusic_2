@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Song {
   final int idSong;
   final String name;
@@ -32,6 +34,10 @@ class Song {
       idAlbum: json['idAlbum'] ?? 0,
       idGenre: json['idGenre'] ?? 0,
     );
+  }
+
+  String get formattedReleaseDate {
+    return DateFormat('dd/MM/yyyy').format(releaseDate);
   }
 
   @override

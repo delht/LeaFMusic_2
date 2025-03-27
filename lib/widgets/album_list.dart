@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:leafmusic_2/models/album.dart';
+import 'package:leafmusic_2/screens/album_detail_screen.dart';
 
 class AlbumList extends StatelessWidget {
   final List<Album> albums;
@@ -28,9 +29,13 @@ class AlbumList extends StatelessWidget {
       child: InkWell(
         onTap: () {
           print("Bạn đã nhấn vào album: ${album.name}");
+          Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AlbumDetailScreen(album: album),),
+          );
         },
         borderRadius: BorderRadius.circular(10),
-        splashColor: Colors.blue.withOpacity(0.3), // Hiệu ứng khi nhấn
+        splashColor: Colors.blue.withOpacity(0.3),
         child: Padding(
           padding: EdgeInsets.all(8),
           child: Column(

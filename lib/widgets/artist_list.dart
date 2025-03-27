@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:leafmusic_2/models/artist.dart';
+import 'package:leafmusic_2/screens/artist_detail_screen.dart';
 
 class ArtistList extends StatelessWidget {
   final List<Artist> artists;
@@ -28,11 +29,17 @@ class ArtistList extends StatelessWidget {
       child: InkWell(
         onTap: () {
           print("Bạn đã nhấn vào nghệ sĩ: ${artist.name}");
+
+          Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ArtistDetailScreen(artist: artist),),
+          );
+
         },
         borderRadius: BorderRadius.circular(10),
         splashColor: Colors.blue.withOpacity(0.3), // Hiệu ứng nước lan tỏa khi nhấn
         child: Ink(
-          padding: EdgeInsets.all(8), // Tạo khoảng cách đẹp hơn
+          padding: EdgeInsets.all(8),
           decoration: BoxDecoration(
             // color: Colors.grey[300], // Màu nền ban đầu
             borderRadius: BorderRadius.circular(10),
