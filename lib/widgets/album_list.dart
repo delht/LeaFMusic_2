@@ -29,10 +29,10 @@ class AlbumList extends StatelessWidget {
       child: InkWell(
         onTap: () {
           print("Bạn đã nhấn vào album: ${album.name}");
-          Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AlbumDetailScreen(album: album),),
-          );
+          // Navigator.push(
+          //     context,
+          //     MaterialPageRoute(builder: (context) => AlbumDetailScreen(album: album),),
+          // );
         },
         borderRadius: BorderRadius.circular(10),
         splashColor: Colors.blue.withOpacity(0.3),
