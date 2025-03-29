@@ -1,45 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:leafmusic_2/bloc/album/album_bloc.dart';
+import 'package:leafmusic_2/bloc/album/album_state.dart';
+import 'package:leafmusic_2/bloc/album/album_event.dart';
 import 'package:leafmusic_2/models/album.dart';
-import 'package:leafmusic_2/screens/album_detail_screen.dart';
 
 class AlbumList extends StatelessWidget {
-  final List<Album> albums;
-
-  const AlbumList({super.key, required this.albums});
+  const AlbumList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 250,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: albums.length, // Hiển thị đúng số album
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        separatorBuilder: (context, index) => const SizedBox(width: 10),
-        itemBuilder: (context, index) {
-          return _buildHorizontalItem(context, albums[index]);
-        },
-      ),
+    return BlocBuilder<AlbumBloc, AlbumState>(
+      builder: (context, state) {
+        if (state is AlbumInitial) {
+          context.read<AlbumBloc>().add(LoadAlbums());
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is AlbumLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is AlbumError) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "Lỗi: ${state.message}", // Hiển thị lỗi chi tiết
+                style: const TextStyle(color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        } else if (state is AlbumLoaded) {
+          List<Album> albums = state.albums;
+          return SizedBox(
+            height: 250,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: albums.length,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              separatorBuilder: (context, index) => const SizedBox(width: 10),
+              itemBuilder: (context, index) {
+                return _buildAlbumItem(context, albums[index]);
+              },
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 
-  Widget _buildHorizontalItem(BuildContext context, Album album) {
+  Widget _buildAlbumItem(BuildContext context, Album album) {
     return Material(
-      color: Colors.transparent, // Không có nền mặc định
+      color: Colors.transparent,
       child: InkWell(
         onTap: () {
           print("Bạn đã nhấn vào album: ${album.name}");
-          // Navigator.push(
-          //     context,
-          //     MaterialPageRoute(builder: (context) => AlbumDetailScreen(album: album),),
-          // );
         },
         borderRadius: BorderRadius.circular(10),
         splashColor: Colors.blue.withOpacity(0.3),
         child: Padding(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
@@ -58,16 +78,12 @@ class AlbumList extends StatelessWidget {
                   },
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               SizedBox(
                 width: 150,
                 child: Text(
                   album.name,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                 ),
