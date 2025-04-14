@@ -1,23 +1,31 @@
 import 'package:flutter/material.dart';
-
-import '../custom/main_layout.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/theme/theme_cubit.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // Khi bấm back từ Settings -> luôn quay về Home
-        Navigator.of(context).pushReplacementNamed('/');
-        return false;
-      },
-      child: MainLayout(
-        title: "Cài đặt",
-        body: Center(child: Text("Đây là SettingScreen")),
+    final themeMode = context.watch<ThemeCubit>().state;
+    final isDarkMode = themeMode == ThemeMode.dark;
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Cài đặt")),
+      body: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Chế độ tối"),
+            Switch(
+              value: isDarkMode,
+              onChanged: (value) {
+                context.read<ThemeCubit>().toggleTheme(value);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-

@@ -9,6 +9,7 @@ import 'package:leafmusic_2/repositories/song_repository.dart';
 import 'package:leafmusic_2/repositories/album_repository.dart';
 
 import 'bloc/artist/artist_bloc.dart';
+import 'bloc/theme/theme_cubit.dart';
 
 // void main() {
 //   runApp(const MyApp());
@@ -21,9 +22,17 @@ import 'bloc/artist/artist_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();  // Đảm bảo Flutter đã khởi tạo
-  await dotenv.load(fileName: ".env");        // Load file .env
 
+
+  await dotenv.load(fileName: ".env");        // Load file .env
   print("IPv4: ${dotenv.env['IPv4']}");
+
+
+  // WidgetsFlutterBinding.ensureInitialized();  // Đảm bảo Flutter đã khởi tạo
+  await dotenv.load(fileName: ".env");        // Load file .env
+  final themeCubit = ThemeCubit();
+  await themeCubit.loadTheme();
+
 
   runApp(const MyApp());
 }
