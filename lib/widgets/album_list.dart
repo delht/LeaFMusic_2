@@ -4,16 +4,21 @@ import 'package:leafmusic_2/bloc/album/album_bloc.dart';
 import 'package:leafmusic_2/bloc/album/album_state.dart';
 import 'package:leafmusic_2/bloc/album/album_event.dart';
 import 'package:leafmusic_2/models/album.dart';
+import 'package:leafmusic_2/screens/details/album_detail_screen.dart';
 
 class AlbumList extends StatelessWidget {
-  const AlbumList({super.key});
+  // const AlbumList({super.key});
+
+  final AlbumEvent event;
+  const AlbumList({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AlbumBloc, AlbumState>(
       builder: (context, state) {
         if (state is AlbumInitial) {
-          context.read<AlbumBloc>().add(LoadAlbums());
+          // context.read<AlbumBloc>().add(LoadAlbums());
+          context.read<AlbumBloc>().add(event);
           return const Center(child: CircularProgressIndicator());
         } else if (state is AlbumLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -54,6 +59,12 @@ class AlbumList extends StatelessWidget {
       child: InkWell(
         onTap: () {
           print("Bạn đã nhấn vào album: ${album.name}");
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AlbumDetailScreen(album: album),
+            ),
+          );
         },
         borderRadius: BorderRadius.circular(10),
         splashColor: Colors.blue.withOpacity(0.3),

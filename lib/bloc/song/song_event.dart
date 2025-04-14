@@ -7,5 +7,26 @@ abstract class SongEvent extends Equatable {
   List<Object> get props => [];
 }
 
-// Sự kiện để tải danh sách bài hát
-class LoadSongs extends SongEvent {}
+// =============================================================================
+
+class LoadSongs extends SongEvent {
+
+} //RANDOM
+
+class LoadTop5SongsByArtist extends SongEvent{
+  final int id_artist;
+  const LoadTop5SongsByArtist(this.id_artist);
+
+  @override
+  List<Object> get props => [id_artist];
+}
+
+class LoadSongsByAlbum extends SongEvent{
+  final int id_album;
+  const LoadSongsByAlbum(this.id_album);
+
+  @override
+  List<Object> get props => [id_album];
+}
+
+

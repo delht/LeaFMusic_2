@@ -6,18 +6,27 @@ import 'package:leafmusic_2/bloc/song/song_state.dart';
 import 'package:leafmusic_2/models/song.dart';
 
 class SongList extends StatelessWidget {
-  const SongList({super.key});
+  // const SongList({super.key});
+
+  final SongEvent event;
+  const SongList({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SongBloc, SongState>(
       builder: (context, state) {
         if (state is SongInitial) {
-          context.read<SongBloc>().add(LoadSongs());
+
+          // context.read<SongBloc>().add(LoadSongs());
+          context.read<SongBloc>().add(event);
           return const Center(child: CircularProgressIndicator());
+
         } else if (state is SongLoading) {
+
           return const Center(child: CircularProgressIndicator());
+
         } else if (state is SongError) {
+          
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -28,8 +37,24 @@ class SongList extends StatelessWidget {
               ),
             ),
           );
+
         } else if (state is SongLoaded) {
+
           List<Song> songs = state.songs;
+
+          if (songs.isEmpty) {
+            return Center(
+              child: Text(
+                "Trống",
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+            );
+          }
+
           return ListView.builder(
             itemCount: songs.length,
             shrinkWrap: true,
@@ -61,6 +86,7 @@ class SongList extends StatelessWidget {
               );
             },
           );
+
         }
         return const SizedBox.shrink();
       },
