@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 class Song {
   final int idSong;
   final String name;
+  final int play;
   final String imageUrl;
   final String fileUrl;
   final DateTime releaseDate;
@@ -13,6 +14,7 @@ class Song {
   const Song({
     required this.idSong,
     required this.name,
+    required this.play,
     required this.imageUrl,
     required this.fileUrl,
     required this.releaseDate,
@@ -25,6 +27,7 @@ class Song {
     return Song(
       idSong: json['idSong'] ?? 0,
       name: json['name'] ?? "No data",
+      play: json['play'] ?? 0,
       imageUrl: json['imageUrl'] ?? "No data",
       fileUrl: json['fileUrl'] ?? "No data",
       releaseDate: json['releaseDate'] != null

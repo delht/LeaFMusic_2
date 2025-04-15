@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:leafmusic_2/bloc/search/search_bloc.dart';
+import 'package:leafmusic_2/repositories/search_repository.dart';
 
 import 'bloc/theme/theme_cubit.dart';
 import 'screens/home_screen.dart';
@@ -36,6 +38,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => SongBloc(songRepository: SongRepository())),
         BlocProvider(create: (_) => AlbumBloc(albumRepository: AlbumRepository())),
         BlocProvider(create: (_) => ArtistBloc(artistRepository: ArtistRepository())),
+        BlocProvider(create: (_) => SearchBloc(searchRepository: SearchRepository())),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
