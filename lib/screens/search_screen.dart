@@ -3,107 +3,137 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/search/search_bloc.dart';
 import '../bloc/search/search_event.dart';
 import '../bloc/search/search_state.dart';
-import '../models/album.dart';
-import '../models/artist.dart';
-import '../models/song.dart';
-import '../repositories/search_repository.dart';
-import '../widgets/search_result_list.dart';
 
-class SearchScreen extends StatelessWidget {
-  const SearchScreen({super.key});
+class SearchScreen extends StatefulWidget {
+  @override
+  _SearchScreenState createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> {
+  TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController controller = TextEditingController();
-    return BlocProvider(
-      create: (_) => SearchBloc(searchRepository: SearchRepository()),
-      child: Scaffold(
-        appBar: AppBar(title: const Text("Search")),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Search'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              // Gửi sự kiện tìm kiếm với từ khóa nhập vào
+              context.read<SearchBloc>().add(LoadSearch(keyword: _searchController.text));
+            },
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(50.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search for songs, artists, albums...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                prefixIcon: Icon(Icons.search),
+              ),
+              onChanged: (query) {
+                // Gửi sự kiện tìm kiếm ngay khi người dùng thay đổi từ khóa
+                context.read<SearchBloc>().add(LoadSearch(keyword: query));
+              },
+            ),
+          ),
+        ),
+      ),
+      body: BlocBuilder<SearchBloc, SearchState>(
+        builder: (context, state) {
+          // Nếu đang tải dữ liệu
+          if (state is SearchLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          // Nếu có dữ liệu tìm được
+          else if (state is SearchLoaded) {
+            var songs = state.result.songs;
+            var artists = state.result.artists;
+            var albums = state.result.albums;
+
+            return SingleChildScrollView(
+              child: Column(
                 children: [
-                  Expanded(
-                    child: TextField(
-                      controller: controller,
-                      decoration: const InputDecoration(hintText: "Enter keyword"),
-                    ),
+                  // Hiển thị bài hát
+                  Text(
+                    "Songs",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {
-                      final keyword = controller.text;
-                      if (keyword.isNotEmpty) {
-                        context.read<SearchBloc>().add(LoadSearch(keyword: keyword));
-                      }
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: songs.length,
+                    itemBuilder: (context, index) {
+                      var song = songs[index];
+                      return ListTile(
+                        title: Text(song.name),  // Hiển thị tên bài hát
+                      );
+                    },
+                  ),
+
+                  // Hiển thị nghệ sĩ
+                  Text(
+                    "Artists",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: artists.length,
+                    itemBuilder: (context, index) {
+                      var artist = artists[index];
+                      return ListTile(
+                        title: Text('Artist ID: ${artist.idArtist}'),  // Hiển thị ID của nghệ sĩ
+                      );
+                    },
+                  ),
+
+                  // Hiển thị album
+                  Text(
+                    "Albums",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: albums.length,
+                    itemBuilder: (context, index) {
+                      var album = albums[index];
+                      return ListTile(
+                        title: Text('Album ID: ${album.idAlbum}'),  // Hiển thị ID của album
+                      );
                     },
                   ),
                 ],
               ),
-            ),
-            Expanded(
-              child: BlocBuilder<SearchBloc, SearchState>(
-                builder: (context, state) {
-                  if (state is SearchLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (state is SearchLoaded) {
-                    if (state.isEmpty) {
-                      return const Center(child: Text("No search results found."));
-                    }
+            );
+          }
 
-                    return ListView(
-                      children: [
-                        if (state.result.songs.isNotEmpty) ...[
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text("Songs", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          ),
-                          SearchResultList<Song>(
-                            result: state.result.songs,
-                            itemBuilder: (song) => ListTile(
-                              title: Text(song.name),
-                              subtitle: Text(song.name),
-                            ),
-                          ),
-                        ],
-                        if (state.result.albums.isNotEmpty) ...[
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text("Albums", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          ),
-                          SearchResultList<Album>(
-                            result: state.result.albums,
-                            itemBuilder: (album) => ListTile(
-                              title: Text(album.name),
-                              subtitle: Text(album.name),
-                            ),
-                          ),
-                        ],
-                        if (state.result.artists.isNotEmpty) ...[
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text("Artists", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          ),
-                          SearchResultList<Artist>(
-                            result: state.result.artists,
-                            itemBuilder: (artist) => ListTile(
-                              title: Text(artist.name),
-                            ),
-                          ),
-                        ],
-                      ],
-                    );
-                  } else if (state is SearchError) {
-                    return Center(child: Text(state.message));
-                  }
-                  return const Center(child: Text("Enter a keyword to search"));
-                },
-              ),
-            ),
-          ],
-        ),
+          // Nếu có lỗi khi tìm kiếm
+          else if (state is SearchError) {
+            return Center(child: Text('Error: ${state.message}'));
+          }
+
+          // Trường hợp không có kết quả
+          else {
+            return Center(child: Text('No results found'));
+          }
+        },
       ),
     );
   }

@@ -54,7 +54,7 @@ class Navbar extends StatelessWidget {
             title: Text("Tìm kiếm"),
             onTap: () {
               Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const SearchScreen())
+                  MaterialPageRoute(builder: (context) =>  SearchScreen())
               );
             },
           ),
@@ -64,7 +64,7 @@ class Navbar extends StatelessWidget {
             title: Text("Danh sách yêu thích"),
             onTap: () {
               Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const SearchScreen())
+                  MaterialPageRoute(builder: (context) =>  SearchScreen())
               );
             },
           ),
