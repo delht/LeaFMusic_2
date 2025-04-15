@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../models/search_result.dart';
 import '../../repositories/search_repository.dart';
 import 'search_event.dart';
 import 'search_state.dart';
@@ -23,7 +24,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       emit(SearchError("Tìm kiếm thất bại"));
     }
   }
-
 
 
 }

@@ -1,93 +1,87 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:leafmusic_2/bloc/song/song_bloc.dart';
-import 'package:leafmusic_2/bloc/song/song_event.dart';
-import 'package:leafmusic_2/bloc/song/song_state.dart';
-import 'package:leafmusic_2/models/song.dart';
+
+import '../bloc/song/song_bloc.dart';
+import '../bloc/song/song_event.dart';
+import '../bloc/song/song_state.dart';
+import '../models/song.dart';
 
 class SongList extends StatelessWidget {
-  // const SongList({super.key});
+  final List<Song>? songs;
+  final SongEvent? event;
 
-  final SongEvent event;
-  const SongList({super.key, required this.event});
+  const SongList({super.key, this.songs, this.event});
+
+  Widget _buildSongTile(BuildContext context, Song song) {
+    return ListTile(
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(5),
+        child: Image.network(
+          song.imageUrl,
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              'assets/images/default_song_image.png',
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
+            );
+          },
+        ),
+      ),
+      title: Text(song.name),
+      subtitle: Text("Nghệ sĩ ${song.idArtist}"),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+      onTap: () {
+        // TODO: Xử lý khi bấm vào bài hát
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    ///TRUYỀN DỮ LIỆU THEO DANH SÁCH
+    if (songs != null) {
+      if (songs!.isEmpty) {
+        return Center(child: Text("Không có bài hát nào"));
+      }
+
+      return ListView.builder(
+        itemCount: songs!.length,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) => _buildSongTile(context, songs![index]),
+      );
+    }
+
+    ///TRUYỀN DỮ LIỆU THEO EVENT
     return BlocBuilder<SongBloc, SongState>(
       builder: (context, state) {
         if (state is SongInitial) {
-
-          // context.read<SongBloc>().add(LoadSongs());
-          context.read<SongBloc>().add(event);
+          context.read<SongBloc>().add(event!);
           return const Center(child: CircularProgressIndicator());
-
         } else if (state is SongLoading) {
-
           return const Center(child: CircularProgressIndicator());
-
         } else if (state is SongError) {
-          
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                "Lỗi: ${state.message}", // Hiển thị lỗi chi tiết
-                style: const TextStyle(color: Colors.red),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          );
-
+          return Center(child: Text("Lỗi: ${state.message}"));
         } else if (state is SongLoaded) {
+          final loadedSongs = state.songs;
 
-          List<Song> songs = state.songs;
-
-          if (songs.isEmpty) {
-            return Center(
-              child: Text(
-                "Trống",
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
-              ),
-            );
+          if (loadedSongs.isEmpty) {
+            return Center(child: Text("Không có bài hát nào"));
           }
 
           return ListView.builder(
-            itemCount: songs.length,
+            itemCount: loadedSongs.length,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              final song = songs[index];
-              return ListTile(
-                leading: ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: Image.network(
-                    song.imageUrl,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        'assets/images/default_song_image.png',
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
-                      );
-                    },
-                  ),
-                ),
-                title: Text(song.name),
-                subtitle: Text("Nghệ sĩ ${song.idArtist}"),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-                onTap: () {},
-              );
-            },
+            itemBuilder: (context, index) => _buildSongTile(context, loadedSongs[index]),
           );
-
         }
+
         return const SizedBox.shrink();
       },
     );
