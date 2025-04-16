@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:leafmusic_2/screens/account/register_screen.dart';
-import '../home_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:leafmusic_2/bloc/account/login_bloc.dart';
+import 'package:leafmusic_2/repositories/auth_repository.dart';
+import 'package:leafmusic_2/screens/home_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -8,83 +11,118 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    //Khai báo biến - Lưu nội dung
-    final TextEditingController usernameController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+    final usernameController = TextEditingController();
+    final passwordController = TextEditingController();
 
-    return Scaffold(
+    return BlocProvider(
+      create: (_) => LoginBloc(AuthRepository()),
+      child: Scaffold(
 
-      appBar: AppBar(
-        title: const Text("Đăng nhập"),
-        centerTitle: true,
-      ),
+        appBar: AppBar(
+          title: const Text("Đăng nhập"),
+          centerTitle: true,
+        ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        body: Padding(
+          padding: const EdgeInsets.all(24.0),
 
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          child: BlocConsumer<LoginBloc, LoginState>(
 
-            TextField(
-              controller: usernameController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
+            listener: (context, state) {
+              if (state is LoginSuccess) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      (route) => false,
+                );
+              } else if (state is LoginFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+              }
+            },
 
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Mật khẩu',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 24),
+            builder: (context, state) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
 
-            // Nút đăng nhập
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
+                children: [
+                  // Tên đăng nhập (Email)
+                  TextField(
+                    controller: usernameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white
-                ),
+                  // Mật khẩu
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Mật khẩu',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
 
-                onPressed: () {
+                  // Nút Đăng nhập
+                  SizedBox(
+                    width: double.infinity,
+                    child: Builder(
+                      builder: (context) {
+                        if (state is LoginLoading) {
+                          return ElevatedButton(
+                            onPressed: null,
+                            child: const CircularProgressIndicator(),
+                          );
+                        } else {
+                          return ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                            ),
+                            onPressed: () {
+                              context.read<LoginBloc>().add(
+                                LoginSubmitted(
+                                  email: usernameController.text,
+                                  password: passwordController.text,
+                                ),
+                              );
+                            },
+                            child: const Text("Đăng nhập"),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 10),
 
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HomeScreen()),
-                        (route) => false,
-                  );
-                },
-                child: const Text("Đăng nhập"),
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            // Nút đăng ký
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
-                  );
-                },
-                child: const Text("Đăng ký"),
-              ),
-            ),
+                  // Nút chuyển qua trang đăng ký
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF6A5FFF),
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                        );
+                      },
+                      child: const Text("Chưa có tài khoản? Đăng ký"),
+                    ),
+                  ),
 
 
-          ],
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

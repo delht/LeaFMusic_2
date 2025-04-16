@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:leafmusic_2/core/auth_manager.dart';
 import 'package:leafmusic_2/bloc/search/search_bloc.dart';
 import 'package:leafmusic_2/repositories/search_repository.dart';
 import 'package:leafmusic_2/screens/account/login_screen.dart';
-
+import 'package:leafmusic_2/screens/home_screen.dart';
 import 'bloc/theme/theme_cubit.dart';
-import 'screens/home_screen.dart';
 import 'bloc/song/song_bloc.dart';
 import 'bloc/album/album_bloc.dart';
 import 'bloc/artist/artist_bloc.dart';
@@ -19,18 +19,22 @@ void main() async {
   await dotenv.load(fileName: ".env");
 
   final themeCubit = ThemeCubit();
-  await themeCubit.loadTheme(); // Load từ SharedPreferences trước khi runApp
+  await themeCubit.loadTheme();
+
+  final isLoggedIn = await AuthManager.isLoggedIn();
 
   runApp(
     BlocProvider.value(
       value: themeCubit,
-      child: const MyApp(),
+      child: MyApp(isLoggedIn: isLoggedIn),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -47,12 +51,13 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: ThemeData.light(),
             darkTheme: ThemeData.dark(),
-            themeMode: themeMode, // Áp dụng chế độ theme hiện tại
-            // home: const HomeScreen(),
-            // home: const TestScreen(),
+            themeMode: themeMode,
+
+            home: isLoggedIn ? const HomeScreen() : const LoginScreen(),
+            // ✅ Routes để Navigator.pushNamed sử dụng
             routes: {
-              '/': (context) => const LoginScreen(),
               '/home': (context) => const HomeScreen(),
+              '/login': (context) => const LoginScreen(),
             },
           );
         },

@@ -1,108 +1,134 @@
 import 'package:flutter/material.dart';
 import 'package:leafmusic_2/screens/account_screen.dart';
-
+import '../core/auth_manager.dart';
 import '../screens/home_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/search_screen.dart';
+import '../screens/account/login_screen.dart';
 
 class Navbar extends StatelessWidget {
   const Navbar({super.key});
 
+  Future<String> _getUsername() async {
+    final prefs = await AuthManager.isLoggedIn();
+    if (!prefs) return "Khách";
+    final username = (await AuthManager.getUsername()) ?? "Khách";
+    return username;
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-                image: DecorationImage(
+
+          FutureBuilder<String>(
+            future: _getUsername(),
+            builder: (context, snapshot) {
+
+              final username = snapshot.data ?? "Đang tải...";
+
+              return DrawerHeader(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
                     image: AssetImage("assets/images/bg.jpg"),
-                    fit:  BoxFit.cover
+                    fit: BoxFit.cover,
+                  ),
+                  color: Colors.green,
                 ),
-                color: Colors.green),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundImage: AssetImage("assets/images/leaf.avif"),
-                  backgroundColor: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const CircleAvatar(
+                      radius: 30,
+                      backgroundImage: AssetImage("assets/images/leaf.avif"),
+                      backgroundColor: Colors.white,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      username,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    )
+                  ],
                 ),
-                // Icon(Icons.account_circle, size: 60, color: Colors.white,),
-                SizedBox(height: 10),
-                Text("Username", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),)
-              ],
-            ),
+              );
+            },
           ),
 
           // =================== Danh sách menu ===================
 
+          ///TRANG CHỦ
           ListTile(
-            leading: Icon(Icons.home),
-            title: Text("Trang chủ"),
+            leading: const Icon(Icons.home),
+            title: const Text("Trang chủ"),
             onTap: () {
               Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const HomeScreen())
-              );
+                  MaterialPageRoute(builder: (context) => const HomeScreen()));
             },
           ),
 
+          ///TÌM KIẾM
           ListTile(
-            leading: Icon(Icons.search),
-            title: Text("Tìm kiếm"),
+            leading: const Icon(Icons.search),
+            title: const Text("Tìm kiếm"),
             onTap: () {
               Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) =>  SearchScreen())
-              );
+                  MaterialPageRoute(builder: (context) => SearchScreen()));
             },
           ),
 
+          ///DANH SÁCH YÊU THÍCH
           ListTile(
-            leading: Icon(Icons.favorite, color: Colors.red, size: 30),
-            title: Text("Danh sách yêu thích"),
+            leading: const Icon(Icons.favorite, color: Colors.red, size: 30),
+            title: const Text("Danh sách yêu thích"),
             onTap: () {
               Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) =>  SearchScreen())
-              );
-            },
-          ),
-
-
-          const Divider(thickness: 1, height: 20),
-
-          ListTile(
-            leading: Icon(Icons.account_circle),
-            title: Text("Tài khoản"),
-            onTap: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => AccountScreen())
-              );
-            }
-          ),
-
-          ListTile(
-            leading: Icon(Icons.settings),
-            title: Text("Cài đặt"),
-            onTap: () {
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const SettingsScreen())
-              );
+                  MaterialPageRoute(builder: (context) => SearchScreen()));
             },
           ),
 
           const Divider(thickness: 1, height: 20),
 
+          ///TÀI KHOẢN
           ListTile(
-            leading: Icon(Icons.logout),
-            title: Text("Đăng xuất"),
-            onTap: () => null,
+              leading: const Icon(Icons.account_circle),
+              title: const Text("Tài khoản"),
+              onTap: () {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => const AccountScreen()));
+              }),
+
+          ///CÀI ĐẶT
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text("Cài đặt"),
+            onTap: () {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => const SettingsScreen()));
+            },
           ),
 
-          // =============================================================================================================================
+          const Divider(thickness: 1, height: 20),
 
+          ///ĐĂNG XUẤT
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text("Đăng xuất"),
+            onTap: () async {
+              await AuthManager.logout();
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+              );
+            },
+          ),
         ],
       ),
     );
