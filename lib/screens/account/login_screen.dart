@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leafmusic_2/bloc/account/login_bloc.dart';
 import 'package:leafmusic_2/repositories/auth_repository.dart';
-import 'package:leafmusic_2/screens/home_screen.dart';
+import 'package:leafmusic_2/screens/main_screen/home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatelessWidget {

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:leafmusic_2/screens/account_screen.dart';
+import 'package:leafmusic_2/screens/main_screen/account_screen.dart';
+import 'package:leafmusic_2/screens/main_screen/favorite_list_screen.dart';
 import '../core/auth_manager.dart';
-import '../screens/home_screen.dart';
-import '../screens/settings_screen.dart';
-import '../screens/search_screen.dart';
+import '../screens/main_screen/home_screen.dart';
+import '../screens/main_screen/settings_screen.dart';
+import '../screens/main_screen/search_screen.dart';
 import '../screens/account/login_screen.dart';
 
 class Navbar extends StatelessWidget {
@@ -89,9 +90,11 @@ class Navbar extends StatelessWidget {
             title: const Text("Danh sách yêu thích"),
             onTap: () {
               Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => SearchScreen()));
+                MaterialPageRoute(builder: (context) => const FavoriteListScreen()),
+              );
             },
           ),
+
 
           const Divider(thickness: 1, height: 20),
 

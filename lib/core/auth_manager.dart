@@ -38,6 +38,9 @@ class AuthManager {
     return prefs.getString('username');
   }
 
-
+  static Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userId');
+  }
 
 }

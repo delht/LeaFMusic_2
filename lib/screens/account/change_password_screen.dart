@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../repositories/auth_repository.dart';
-import '../home_screen.dart';
+import '../main_screen/home_screen.dart';
 import 'login_screen.dart';
 
 class ChangePasswordScreen extends StatelessWidget {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/song.dart';
 
 class SongRepository {
@@ -41,5 +42,28 @@ class SongRepository {
     }
   }
 
+  ///===================================================================================
+
+
+  Future<List<Song>> fetchSongsFromFavorite(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse("http://$ip/api/favoritelists/songs/$id"),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return data.map((json) => Song.fromJson(json)).toList();
+    } else {
+      final error = jsonDecode(response.body)['message'] ?? 'Lấy danh sách bài hát yêu thích thất bại';
+      throw Exception(error);
+    }
+  }
 
 }

@@ -5,7 +5,7 @@ import 'package:leafmusic_2/core/auth_manager.dart';
 import 'package:leafmusic_2/bloc/search/search_bloc.dart';
 import 'package:leafmusic_2/repositories/search_repository.dart';
 import 'package:leafmusic_2/screens/account/login_screen.dart';
-import 'package:leafmusic_2/screens/home_screen.dart';
+import 'package:leafmusic_2/screens/main_screen/home_screen.dart';
 import 'bloc/theme/theme_cubit.dart';
 import 'bloc/song/song_bloc.dart';
 import 'bloc/album/album_bloc.dart';
@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
             themeMode: themeMode,
 
             home: isLoggedIn ? const HomeScreen() : const LoginScreen(),
-            // ✅ Routes để Navigator.pushNamed sử dụng
+
             routes: {
               '/home': (context) => const HomeScreen(),
               '/login': (context) => const LoginScreen(),

@@ -10,7 +10,7 @@ class SongBloc extends Bloc<SongEvent, SongState> {
     on<LoadSongs>(_onLoadSongs);
     on<LoadTop5SongsByArtist>(_onLoadSongsByArtist);
     on<LoadSongsByAlbum>(_onLoadSongsByAlbum);
-
+    on<LoadSongsFromFavorite>(_onLoadSongsFromFavorite);
   }
 
   void _onLoadSongs(LoadSongs event, Emitter<SongState> emit) async {
@@ -39,7 +39,17 @@ class SongBloc extends Bloc<SongEvent, SongState> {
       final songs = await songRepository.fetchTop5SongByArtist(event.id_album);
       emit(SongLoaded(songs));
     } catch (e) {
-      emit(SongError("Failed to load songs by artist"));
+      emit(SongError("Tải danh sách bài hát của ca sĩ thất bại"));
+    }
+  }
+
+  void _onLoadSongsFromFavorite(LoadSongsFromFavorite event, Emitter<SongState> emit) async {
+    emit(SongLoading());
+    try {
+      final songs = await songRepository.fetchSongsFromFavorite(event.id_user);
+      emit(SongLoaded(songs));
+    } catch (e) {
+      emit(SongError("Tải danh sách bài hát thất bại"));
     }
   }
 

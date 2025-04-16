@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leafmusic_2/screens/account/change_password_screen.dart';
 
-import '../bloc/theme/theme_cubit.dart';
-import '../custom/main_layout.dart';
+import '../../bloc/theme/theme_cubit.dart';
+import '../../custom/main_layout.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});

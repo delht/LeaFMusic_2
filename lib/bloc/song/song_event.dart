@@ -29,4 +29,12 @@ class LoadSongsByAlbum extends SongEvent{
   List<Object> get props => [id_album];
 }
 
+class LoadSongsFromFavorite extends SongEvent{
+  final String id_user;
+  const LoadSongsFromFavorite(this.id_user);
+
+  @override
+  List<Object> get props => [id_user];
+}
+
 

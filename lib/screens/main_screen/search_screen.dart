@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leafmusic_2/custom/main_layout.dart';
 import 'package:leafmusic_2/widgets/search/album_list_search.dart';
 import 'package:leafmusic_2/widgets/song_list.dart';
-import '../bloc/search/search_bloc.dart';
-import '../bloc/search/search_event.dart';
-import '../bloc/search/search_state.dart';
-import '../widgets/search/artist_list_search.dart';
+import '../../bloc/search/search_bloc.dart';
+import '../../bloc/search/search_event.dart';
+import '../../bloc/search/search_state.dart';
+import '../../widgets/search/artist_list_search.dart';
 
 class SearchScreen extends StatefulWidget {
   @override

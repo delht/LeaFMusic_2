@@ -10,9 +10,11 @@ import 'package:leafmusic_2/bloc/song/song_state.dart';
 import 'package:leafmusic_2/bloc/album/album_bloc.dart';
 import 'package:leafmusic_2/bloc/album/album_event.dart';
 import 'package:leafmusic_2/bloc/album/album_state.dart';
-import '../bloc/artist/artist_bloc.dart';
-import '../bloc/artist/artist_event.dart';
-import '../widgets/section_title.dart';
+
+import '../../bloc/artist/artist_bloc.dart';
+import '../../bloc/artist/artist_event.dart';
+import '../../widgets/section_title.dart';
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
