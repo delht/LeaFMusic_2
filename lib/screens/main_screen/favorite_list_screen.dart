@@ -8,6 +8,7 @@ import '../../bloc/song/song_bloc.dart';
 import '../../bloc/song/song_event.dart';
 import '../../bloc/song/song_state.dart';
 import '../../custom/main_layout.dart';
+import '../../widgets/song_list2.dart';
 
 class FavoriteListScreen extends StatefulWidget {
   const FavoriteListScreen({super.key});
@@ -60,7 +61,29 @@ class _FavoriteListScreenState extends State<FavoriteListScreen> {
               } else if (state is SongError) {
                 return Center(child: Text("Lỗi: ${state.message}"));
               } else if (state is SongLoaded) {
-                return SongList(event: LoadSongsFromFavorite(userId!));
+                // return SongList2(event: LoadSongsFromFavorite(userId!));
+                // return Padding(
+                //   padding: const EdgeInsets.only(top: 10),
+                //   child: SongList2(event: LoadSongsFromFavorite(userId!)),
+                // );
+
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 70),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Text("[ Nhấn giữ để xoá bài hát khỏi danh sách yêu thích ]", style: TextStyle(fontSize: 16, color: Colors.grey),),
+                      ),
+                      Expanded(
+                        child: SongList2(event: LoadSongsFromFavorite(userId!)),
+                      ),
+                    ],
+                  ),
+                );
+
+
               }
 
               return const Center(child: Text("Danh sách yêu thích sẽ được hiển thị ở đây"));
