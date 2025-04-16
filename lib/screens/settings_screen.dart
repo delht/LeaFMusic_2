@@ -11,7 +11,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Navigator.of(context).pushReplacementNamed('/');
+        Navigator.of(context).pushReplacementNamed('/home');
         return false;
       },
       child: MainLayout(

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:leafmusic_2/bloc/search/search_bloc.dart';
 import 'package:leafmusic_2/repositories/search_repository.dart';
+import 'package:leafmusic_2/screens/account/login_screen.dart';
 
 import 'bloc/theme/theme_cubit.dart';
 import 'screens/home_screen.dart';
@@ -47,7 +48,12 @@ class MyApp extends StatelessWidget {
             theme: ThemeData.light(),
             darkTheme: ThemeData.dark(),
             themeMode: themeMode, // Áp dụng chế độ theme hiện tại
-            home: const HomeScreen(),
+            // home: const HomeScreen(),
+            // home: const TestScreen(),
+            routes: {
+              '/': (context) => const LoginScreen(),
+              '/home': (context) => const HomeScreen(),
+            },
           );
         },
       ),

@@ -26,14 +26,16 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
-          Navigator.of(context).pushReplacementNamed('/');
+          Navigator.of(context).pushReplacementNamed('/home');
           return false;
         },
+
         child: MainLayout(
         title: 'Tìm kiếm',
         body: Column(
           children: [
-            /// Phần search input
+
+            /// Thanh tìm kiếm
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -63,9 +65,12 @@ class _SearchScreenState extends State<SearchScreen> {
             Expanded(
               child: BlocBuilder<SearchBloc, SearchState>(
                 builder: (context, state) {
+
                   if (state is SearchLoading) {
                     return const Center(child: CircularProgressIndicator());
+
                   } else if (state is SearchLoaded) {
+
                     var songs = state.result.songs;
                     var artists = state.result.artists;
                     var albums = state.result.albums;
@@ -74,6 +79,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+
                           const Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Text("Songs", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
@@ -91,14 +97,17 @@ class _SearchScreenState extends State<SearchScreen> {
                             child: Text("Albums", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                           ),
                           AlbumListSearch(albums: albums),
+
                         ],
                       ),
                     );
+
                   } else if (state is SearchError) {
                     return Center(child: Text('Error: ${state.message}'));
                   } else {
                     return const Center(child: Text('Không có kết quả'));
                   }
+
                 },
               ),
             ),

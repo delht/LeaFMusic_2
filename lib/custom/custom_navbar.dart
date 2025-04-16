@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:leafmusic_2/screens/account_screen.dart';
 
 import '../screens/home_screen.dart';
 import '../screens/settings_screen.dart';
@@ -75,7 +76,11 @@ class Navbar extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.account_circle),
             title: Text("Tài khoản"),
-            onTap: () => null,
+            onTap: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => AccountScreen())
+              );
+            }
           ),
 
           ListTile(
