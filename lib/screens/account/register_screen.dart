@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../repositories/auth_repository.dart';
 import '../home_screen.dart';
 import 'login_screen.dart';
 
@@ -64,46 +65,58 @@ class RegisterScreen extends StatelessWidget {
                   foregroundColor: Colors.white,
                 ),
 
-                onPressed: () {
+                  onPressed: () async {
+                    final email = usernameController.text.trim();
+                    final password = passwordController.text.trim();
+                    final confirmPassword = confirmPasswordController.text.trim();
 
-                  final email = usernameController.text;
-                  final password = passwordController.text;
-                  final confirmPassword = confirmPasswordController.text;
+                    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Vui lòng nhập đầy đủ thông tin'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
 
-                  if(email.isEmpty || password.isEmpty || confirmPassword.isEmpty){
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Vui lòng nhập đầy đủ thông tin'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                    return;
-                  }
-                  if (password != confirmPassword) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Thông tin mật khẩu không giống nhau'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                    return;
-                  }
+                    if (password != confirmPassword) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Thông tin mật khẩu không giống nhau'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Đăng ký thành công!'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
+                    try {
+                      final authRepo = AuthRepository();
+                      final result = await authRepo.register(email, password);
 
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HomeScreen()),
-                        (route) => false,
-                  );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Đăng ký thành công!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
 
-                },
-                child: const Text("Đăng ký"),
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                            (route) => false,
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(e.toString().replaceAll('Exception: ', '')),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+
+                  child: const Text("Đăng ký"),
 
               ),
             ),

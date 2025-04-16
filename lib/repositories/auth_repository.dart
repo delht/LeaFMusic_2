@@ -20,4 +20,28 @@ class AuthRepository {
       throw Exception('Sai tài khoản hoặc mật khẩu');
     }
   }
+
+
+  Future<Map<String, dynamic>> register(String email, String password) async {
+    final url = Uri.parse('http://$ip/api/users/register');
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body); // trả về token, user info nếu có
+    } else {
+      final error = jsonDecode(response.body)['message'] ?? 'Đăng ký thất bại';
+      throw Exception(error);
+    }
+  }
+
+
+
+
+
+
 }
