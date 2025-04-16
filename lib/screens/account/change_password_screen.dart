@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../repositories/auth_repository.dart';
 import '../home_screen.dart';
 import 'login_screen.dart';
 
@@ -66,13 +68,12 @@ class ChangePasswordScreen extends StatelessWidget {
                   foregroundColor: Colors.white,
                 ),
 
-                onPressed: () {
-
-                  final passold = passwordOldController.text;
+                onPressed: () async {
+                  final passOld = passwordOldController.text;
                   final password = passwordController.text;
                   final confirmPassword = confirmPasswordController.text;
 
-                  if(passold.isEmpty || password.isEmpty || confirmPassword.isEmpty){
+                  if (passOld.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Vui lòng nhập đầy đủ thông tin'),
@@ -81,6 +82,7 @@ class ChangePasswordScreen extends StatelessWidget {
                     );
                     return;
                   }
+
                   if (password != confirmPassword) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -91,15 +93,40 @@ class ChangePasswordScreen extends StatelessWidget {
                     return;
                   }
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Đổi mật khẩu thành công!'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
+                  try {
+                    final prefs = await SharedPreferences.getInstance();
+                    final userId = prefs.getString('userId');
 
+                    if (userId == null) {
+                      throw Exception('Không tìm thấy người dùng');
+                    }
 
+                    await AuthRepository().changePassword(
+                      userId: userId,
+                      oldPassword: passOld,
+                      newPassword: password,
+                    );
+
+                    passwordOldController.clear();
+                    passwordController.clear();
+                    confirmPasswordController.clear();
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Đổi mật khẩu thành công!'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(e.toString()),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 },
+
                 child: const Text("Đổi mật khẩu"),
 
               ),
