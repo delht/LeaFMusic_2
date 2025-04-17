@@ -6,6 +6,7 @@ import '../bloc/song/song_bloc.dart';
 import '../bloc/song/song_event.dart';
 import '../bloc/song/song_state.dart';
 import '../models/song.dart';
+import '../screens/main_screen/music_player_screen.dart';
 
 class SongList2 extends StatelessWidget {
   final List<Song>? songs;
@@ -13,7 +14,7 @@ class SongList2 extends StatelessWidget {
 
   const SongList2({super.key, this.songs, this.event});
 
-  Widget _buildSongTile(BuildContext context, Song song) {
+  Widget _buildSongTile(BuildContext context, Song song, List<Song> songsToPlay) {
     return ListTile(
       leading: ClipRRect(
         borderRadius: BorderRadius.circular(5),
@@ -36,11 +37,20 @@ class SongList2 extends StatelessWidget {
       subtitle: Text("Nghệ sĩ ${song.idArtist}"),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
 
-
       onTap: () {
-        // TODO: xử lý khi bấm vào bài hát
+        final index = songsToPlay.indexWhere((s) => s.idSong == song.idSong);
+        if (index != -1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => MusicPlayerScreen(
+                songs: songsToPlay,
+                initialIndex: index,
+              ),
+            ),
+          );
+        }
       },
-
 
       onLongPress: () async {
         final confirm = await showDialog<bool>(
@@ -82,33 +92,27 @@ class SongList2 extends StatelessWidget {
           }
         }
       },
-
-
-
-
     );
-
-
   }
 
   @override
   Widget build(BuildContext context) {
-
-    ///TRUYỀN DỮ LIỆU THEO DANH SÁCH
+    /// TRƯỜNG HỢP: Đã truyền sẵn danh sách songs
     if (songs != null) {
       if (songs!.isEmpty) {
-        return Center(child: Text("Không có bài hát nào"));
+        return const Center(child: Text("Không có bài hát nào"));
       }
 
       return ListView.builder(
         itemCount: songs!.length,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) => _buildSongTile(context, songs![index]),
+        itemBuilder: (context, index) =>
+            _buildSongTile(context, songs![index], songs!),
       );
     }
 
-    ///TRUYỀN DỮ LIỆU THEO EVENT
+    /// TRƯỜNG HỢP: Lấy danh sách từ Bloc theo event
     return BlocBuilder<SongBloc, SongState>(
       builder: (context, state) {
         if (state is SongInitial) {
@@ -122,14 +126,15 @@ class SongList2 extends StatelessWidget {
           final loadedSongs = state.songs;
 
           if (loadedSongs.isEmpty) {
-            return Center(child: Text("Không có bài hát nào"));
+            return const Center(child: Text("Không có bài hát nào"));
           }
 
           return ListView.builder(
             itemCount: loadedSongs.length,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) => _buildSongTile(context, loadedSongs[index]),
+            itemBuilder: (context, index) =>
+                _buildSongTile(context, loadedSongs[index], loadedSongs),
           );
         }
 

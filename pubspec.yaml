@@ -41,6 +41,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   dotenv: ^4.2.0
   shared_preferences: ^2.5.3
+  audioplayers: ^5.2.0
 
 dev_dependencies:
   flutter_test:
