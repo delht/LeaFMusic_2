@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../models/song.dart';
+import '../../repositories/song_repository.dart';
+import '../../repositories/artist_repository.dart'; // Thêm dòng này
+import '../../models/artist.dart'; // Thêm dòng này
 
 class MusicPlayerScreen extends StatefulWidget {
   final List<Song> songs;
@@ -20,11 +25,16 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   late AudioPlayer _audioPlayer;
   late int _currentIndex;
   bool _isPlaying = false;
-  bool _isLooping = false; // ✅ trạng thái lặp lại
-  bool _isFavorite = false; // ✅ trạng thái trái tim
+  bool _isLooping = false;
+  bool _isFavorite = false;
+
+  final SongRepository _songRepository = SongRepository();
+  final ArtistRepository _artistRepository = ArtistRepository();
 
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
+
+  String? _artistName;
 
   Song get currentSong => widget.songs[_currentIndex];
 
@@ -48,7 +58,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
     _audioPlayer.onPlayerComplete.listen((event) {
       if (_isLooping) {
-        _playCurrentSong(); // ✅ lặp lại
+        _playCurrentSong();
       } else {
         _playNext();
       }
@@ -58,10 +68,36 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   Future<void> _playCurrentSong() async {
     await _audioPlayer.stop();
     await _audioPlayer.play(UrlSource(currentSong.fileUrl));
-    setState(() {
-      _isPlaying = true;
-      _isFavorite = false; // trạng thái giả, bạn sẽ thay bằng check thật sau
-    });
+    setState(() => _isPlaying = true);
+    await _checkIfFavorite();
+    await _loadArtistName(); // Gọi để hiển thị tên nghệ sĩ
+  }
+
+  Future<void> _loadArtistName() async {
+    try {
+      final artist = await _artistRepository.fetchArtistsInfor(currentSong.idArtist);
+      setState(() {
+        _artistName = artist.name;
+      });
+    } catch (e) {
+      setState(() {
+        _artistName = 'Không rõ';
+      });
+    }
+  }
+
+  Future<void> _checkIfFavorite() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    if (userId == null) return;
+
+    try {
+      final favoriteSongs = await _songRepository.fetchSongsFromFavorite(userId);
+      final exists = favoriteSongs.any((song) => song.idSong == currentSong.idSong);
+      setState(() => _isFavorite = exists);
+    } catch (_) {
+      setState(() => _isFavorite = false);
+    }
   }
 
   void _togglePlayPause() {
@@ -76,16 +112,23 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   }
 
   void _toggleLoop() {
-    setState(() {
-      _isLooping = !_isLooping;
-    });
+    setState(() => _isLooping = !_isLooping);
   }
 
-  void _toggleFavorite() {
-    setState(() {
-      _isFavorite = !_isFavorite;
-    });
-    // TODO: Viết logic thêm/xóa khỏi yêu thích ở đây
+  void _toggleFavorite() async {
+    try {
+      if (_isFavorite) {
+        await _songRepository.deleteSongFromFavorite(currentSong.idSong);
+        setState(() => _isFavorite = false);
+      } else {
+        await _songRepository.addSongToFavorite(currentSong.idSong);
+        setState(() => _isFavorite = true);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi: ${e.toString()}')),
+      );
+    }
   }
 
   void _playNext() {
@@ -120,23 +163,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(currentSong.name),
-        actions: [
-          IconButton(
-            icon: Icon(
-              _isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: _isFavorite ? Colors.red : Colors.white,
-            ),
-            onPressed: _toggleFavorite,
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             const SizedBox(height: 30),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+            ClipOval(
               child: Image.network(
                 currentSong.imageUrl,
                 width: 250,
@@ -152,7 +185,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             ),
             const SizedBox(height: 20),
             Text(currentSong.name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            Text("Nghệ sĩ ID: ${currentSong.idArtist}", style: const TextStyle(fontSize: 16, color: Colors.grey)),
+            Text("Nghệ sĩ: ${_artistName ?? 'Đang tải...'}", style: const TextStyle(fontSize: 16, color: Colors.grey)),
+            Text("Phát hành: ${currentSong.formattedReleaseDate}", style: const TextStyle(fontSize: 16, color: Colors.grey)),
 
             Slider(
               value: _position.inSeconds.toDouble(),
@@ -173,8 +207,15 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
             const SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                IconButton(
+                  icon: Icon(
+                    _isLooping ? Icons.repeat_one : Icons.repeat,
+                    color: _isLooping ? Colors.blue : Colors.grey,
+                  ),
+                  onPressed: _toggleLoop,
+                ),
                 IconButton(
                   icon: const Icon(Icons.skip_previous),
                   iconSize: 36,
@@ -190,22 +231,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                   iconSize: 36,
                   onPressed: _playNext,
                 ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
                 IconButton(
                   icon: Icon(
-                    _isLooping ? Icons.repeat_one : Icons.repeat,
-                    color: _isLooping ? Colors.blue : Colors.grey,
+                    _isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: _isFavorite ? Colors.red : Colors.grey,
                   ),
-                  onPressed: _toggleLoop,
+                  onPressed: _toggleFavorite,
                 ),
-                const SizedBox(width: 8),
-                const Text("Lặp lại", style: TextStyle(fontSize: 16)),
               ],
             ),
           ],

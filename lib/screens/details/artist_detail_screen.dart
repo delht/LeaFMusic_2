@@ -63,19 +63,20 @@ class ArtistDetailScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               Text(
-                "Top 5 bài hát nổi bật",
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 5),
-              SongList(event: LoadTop5SongsByArtist(artist.idArtist)),
-              const SizedBox(height: 8),
-
-              Text(
                 "Danh sách album",
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 5),
               AlbumList(event: LoadAlbumByArtist(artist.idArtist)),
+              const SizedBox(height: 8),
+
+
+              Text(
+                "Top 5 bài hát nổi bật",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 5),
+              SongList(event: LoadTop5SongsByArtist(artist.idArtist)),
               const SizedBox(height: 8),
 
             ],

@@ -91,6 +91,33 @@ class SongRepository {
     }
   }
 
+  Future<void> addSongToFavorite(int songId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final userId = prefs.getString('userId');
+
+    if (token == null || userId == null) {
+      throw Exception("Thiếu token hoặc userId");
+    }
+
+    final url = Uri.parse("http://$ip/api/favoritelists/add?idUser=$userId&idSong=$songId");
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      final error = jsonDecode(response.body)['message'] ?? 'Thêm không thành công';
+      throw Exception(error);
+    }
+  }
+
+
 ///===================================================================================
+
 
 }

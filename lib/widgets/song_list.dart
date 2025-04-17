@@ -5,6 +5,7 @@ import '../bloc/song/song_bloc.dart';
 import '../bloc/song/song_event.dart';
 import '../bloc/song/song_state.dart';
 import '../models/song.dart';
+import '../screens/main_screen/music_player_screen.dart';
 
 class SongList extends StatelessWidget {
   final List<Song>? songs;
@@ -12,7 +13,7 @@ class SongList extends StatelessWidget {
 
   const SongList({super.key, this.songs, this.event});
 
-  Widget _buildSongTile(BuildContext context, Song song) {
+  Widget _buildSongTile(BuildContext context, Song song, int index, List<Song> songList) {
     return ListTile(
       leading: ClipRRect(
         borderRadius: BorderRadius.circular(5),
@@ -35,15 +36,22 @@ class SongList extends StatelessWidget {
       subtitle: Text("Nghệ sĩ ${song.idArtist}"),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
       onTap: () {
-        // TODO: Xử lý khi bấm vào bài hát
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => MusicPlayerScreen(
+              songs: songList,
+              initialIndex: index,
+            ),
+          ),
+        );
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-
-    ///TRUYỀN DỮ LIỆU THEO DANH SÁCH
+    /// TRUYỀN DỮ LIỆU THEO DANH SÁCH CÓ SẴN
     if (songs != null) {
       if (songs!.isEmpty) {
         return Center(child: Text("Không có bài hát nào"));
@@ -53,11 +61,11 @@ class SongList extends StatelessWidget {
         itemCount: songs!.length,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) => _buildSongTile(context, songs![index]),
+        itemBuilder: (context, index) => _buildSongTile(context, songs![index], index, songs!),
       );
     }
 
-    ///TRUYỀN DỮ LIỆU THEO EVENT
+    /// TRUYỀN DỮ LIỆU THEO EVENT (BLOC)
     return BlocBuilder<SongBloc, SongState>(
       builder: (context, state) {
         if (state is SongInitial) {
@@ -78,7 +86,7 @@ class SongList extends StatelessWidget {
             itemCount: loadedSongs.length,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) => _buildSongTile(context, loadedSongs[index]),
+            itemBuilder: (context, index) => _buildSongTile(context, loadedSongs[index], index, loadedSongs),
           );
         }
 
