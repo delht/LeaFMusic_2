@@ -5,7 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../bloc/song/song_bloc.dart';
 import '../bloc/song/song_event.dart';
 import '../bloc/song/song_state.dart';
+import '../models/artist.dart';
 import '../models/song.dart';
+import '../repositories/artist_repository.dart';
 import '../screens/main_screen/music_player_screen.dart';
 
 class SongList2 extends StatelessWidget {
@@ -34,7 +36,20 @@ class SongList2 extends StatelessWidget {
         ),
       ),
       title: Text(song.name),
-      subtitle: Text("Nghệ sĩ ${song.idArtist}"),
+
+      subtitle: FutureBuilder<Artist>(
+        future: ArtistRepository().fetchArtistsInfor(song.idArtist),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Text("Đang tải nghệ sĩ...");
+          } else if (snapshot.hasError) {
+            return const Text("Không thể tải nghệ sĩ");
+          } else {
+            final artist = snapshot.data!;
+            return Text("${artist.name}");
+          }
+        },
+      ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
 
       onTap: () {

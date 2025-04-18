@@ -14,7 +14,7 @@ class AlbumRepository {
     final response = await http.get(Uri.parse("http://$ip/api/albums/random"));
 
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+      List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
       return data.map((json) => Album.fromJson(json)).toList();
     } else {
       throw Exception("Không thể tải album");
@@ -25,7 +25,7 @@ class AlbumRepository {
     final response = await http.get(Uri.parse("http://$ip/api/albums/artist/$id"));
 
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+      List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
       return data.map((json) => Album.fromJson(json)).toList();
     } else {
       throw Exception("Không thể tải album");

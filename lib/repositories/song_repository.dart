@@ -13,7 +13,8 @@ class SongRepository {
     final response = await http.get(Uri.parse("http://$ip/api/songs/random"));
 
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+      // List<dynamic> data = json.decode(response.body);
+      List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
       return data.map((json) => Song.fromJson(json)).toList();
     } else {
       throw Exception("Lấy dữ liệu bài hát thất bại");
@@ -24,7 +25,8 @@ class SongRepository {
     final response = await http.get(Uri.parse("http://$ip/api/songs/artist/$id"));
 
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+      // List<dynamic> data = json.decode(response.body);
+      List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
       return data.map((json) => Song.fromJson(json)).toList();
     } else {
       throw Exception("Lấy dữ liệu bài hát thất bại");
@@ -35,7 +37,8 @@ class SongRepository {
     final response = await http.get(Uri.parse("http://$ip/api/songs/album/$id"));
 
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+      // List<dynamic> data = json.decode(response.body);
+      List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
       return data.map((json) => Song.fromJson(json)).toList();
     } else {
       throw Exception("Lấy dữ liệu bài hát thất bại");
@@ -71,7 +74,8 @@ class SongRepository {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+      // List<dynamic> data = json.decode(response.body);
+      List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
       return data.map((json) => Song.fromJson(json)).toList();
     } else {
       final error = jsonDecode(response.body)['message'] ?? 'Lấy danh sách bài hát yêu thích thất bại';

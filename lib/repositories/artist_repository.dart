@@ -14,7 +14,7 @@ class ArtistRepository{
     final response = await http.get(Uri.parse("http://$ip/api/artists/random"));
 
     if (response.statusCode == 200){
-      List<dynamic> data = json.decode(response.body);
+      List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
       return data.map((json) => Artist.fromJson(json)).toList();
     }else{
       throw Exception("Không thể tải ca sĩ");
@@ -25,7 +25,7 @@ class ArtistRepository{
     final response = await http.get(Uri.parse("http://$ip/api/artists/$id"));
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = json.decode(utf8.decode(response.bodyBytes));
       return Artist.fromJson(data);
     } else {
       throw Exception('Failed to load artist');

@@ -10,7 +10,7 @@ class SearchRepository {
   Future<SearchResult> search(String keyword) async {
     final response = await http.get(Uri.parse("http://$ip/api/search?keyword=$keyword"));
     if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
+      final jsonData = json.decode(utf8.decode(response.bodyBytes));
       return SearchResult.fromJson(jsonData);
     } else {
       print("Error: ${response.statusCode} - ${response.body}");
