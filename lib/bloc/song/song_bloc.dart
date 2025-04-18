@@ -36,12 +36,13 @@ class SongBloc extends Bloc<SongEvent, SongState> {
   void _onLoadSongsByAlbum(LoadSongsByAlbum event, Emitter<SongState> emit) async {
     emit(SongLoading());
     try {
-      final songs = await songRepository.fetchTop5SongByArtist(event.id_album);
+      final songs = await songRepository.fetchSongsByAlbum(event.id_album);
       emit(SongLoaded(songs));
     } catch (e) {
       emit(SongError("Tải danh sách bài hát của ca sĩ thất bại"));
     }
   }
+
 
   void _onLoadSongsFromFavorite(LoadSongsFromFavorite event, Emitter<SongState> emit) async {
     emit(SongLoading());

@@ -31,7 +31,7 @@ class SongRepository {
     }
   }
 
-  Future<List<Song>> fetchSongsByArtist(int id) async {
+  Future<List<Song>> fetchSongsByAlbum(int id) async {
     final response = await http.get(Uri.parse("http://$ip/api/songs/album/$id"));
 
     if (response.statusCode == 200) {
@@ -41,6 +41,19 @@ class SongRepository {
       throw Exception("Lấy dữ liệu bài hát thất bại");
     }
   }
+
+
+  // Future<List<Song>> fetchSongsByAlbum(int id) async {
+  //   final response = await http.get(Uri.parse("http://$ip/api/songs/album/$id"));
+  //
+  //   if (response.statusCode == 200) {
+  //     List<dynamic> data = json.decode(response.body);
+  //     return data.map((json) => Song.fromJson(json)).toList();
+  //   } else {
+  //     throw Exception("Lấy dữ liệu bài hát thất bại");
+  //   }
+  // }
+
 
   ///===================================================================================
 
