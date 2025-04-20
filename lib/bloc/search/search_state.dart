@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../../models/search_result.dart';
+import '../../models/search_result2.dart';
 
 abstract class SearchState extends Equatable {
   const SearchState();
@@ -24,6 +25,23 @@ class SearchLoaded extends SearchState {
   bool get isEmpty =>
       result.songs.isEmpty && result.artists.isEmpty && result.albums.isEmpty;
 }
+
+// ====================
+class SearchLoaded2 extends SearchState {
+  final SearchResult2 result;
+
+  const SearchLoaded2(this.result);
+
+  @override
+  List<Object> get props => [result];
+
+  // Thêm phương thức kiểm tra xem tất cả các kết quả có rỗng không
+  bool get isEmpty =>
+      result.songs.isEmpty && result.artists.isEmpty && result.albums.isEmpty;
+}
+// ====================
+
+
 
 class SearchError extends SearchState {
   final String message;

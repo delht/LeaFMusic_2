@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import '../models/search_result.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import '../models/search_result2.dart';
+
 class SearchRepository {
 
   final String ip = "${dotenv.env['IPv4']}:${dotenv.env['port']}";
@@ -17,4 +19,20 @@ class SearchRepository {
       throw Exception("Tìm kiếm thất bại");
     }
   }
+
+  Future<SearchResult2> search2(String keyword) async {
+    final response = await http.get(Uri.parse("http://$ip/api/search/v2?keyword=$keyword"));
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(utf8.decode(response.bodyBytes));
+      return SearchResult2.fromJson(jsonData);
+    } else {
+      print("Error: ${response.statusCode} - ${response.body}");
+      throw Exception("Tìm kiếm thất bại");
+    }
+  }
+
+
+
+
+
 }

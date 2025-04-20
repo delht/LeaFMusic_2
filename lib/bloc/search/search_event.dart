@@ -15,3 +15,13 @@ class LoadSearch extends SearchEvent {
   @override
   List<Object> get props => [keyword];
 }
+
+
+class LoadSearch2 extends SearchEvent {
+  final String keyword;
+
+  LoadSearch2({required this.keyword});
+
+  @override
+  List<Object> get props => [keyword];
+}

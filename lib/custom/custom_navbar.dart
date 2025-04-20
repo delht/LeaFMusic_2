@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:leafmusic_2/screens/main_screen/account_screen.dart';
 import 'package:leafmusic_2/screens/main_screen/favorite_list_screen.dart';
+import 'package:leafmusic_2/screens/main_screen/search_screen2.dart';
 import '../core/auth_manager.dart';
 import '../screens/main_screen/home_screen.dart';
 import '../screens/main_screen/settings_screen.dart';
@@ -83,7 +84,7 @@ class Navbar extends StatelessWidget {
             title: const Text("Tìm kiếm"),
             onTap: () {
               Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => SearchScreen()));
+                  MaterialPageRoute(builder: (context) => SearchScreen2()));
             },
           ),
 
