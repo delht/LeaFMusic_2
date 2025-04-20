@@ -1,6 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthManager {
+
+  ///Lưu thông tin khi đăng nhập (SharedPreferences)
   static Future<void> saveUserInfo({
     required String token,
     required String userId,
@@ -14,6 +16,7 @@ class AuthManager {
     await prefs.setString('email', email);
   }
 
+  ///Check token coi có chưa
   static Future<bool> isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token') != null;

@@ -8,6 +8,8 @@ abstract class SongEvent extends Equatable {
 }
 
 // =============================================================================
+///Mồi class đại diện cho cho hành động của user hay của app
+///Khi được gọi: context.read<SongBloc>().add(LoadSongs());
 
 class LoadSongs extends SongEvent {
 

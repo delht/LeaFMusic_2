@@ -8,8 +8,9 @@ import '../../repositories/artist_repository.dart'; // Thêm dòng này
 import '../../models/artist.dart'; // Thêm dòng này
 
 class MusicPlayerScreen extends StatefulWidget {
-  final List<Song> songs;
-  final int initialIndex;
+
+  final List<Song> songs; ///Danh sách bài hát truyền vào
+  final int initialIndex; ///Vị trí song được chọn
 
   const MusicPlayerScreen({
     super.key,
@@ -21,12 +22,15 @@ class MusicPlayerScreen extends StatefulWidget {
   State<MusicPlayerScreen> createState() => _MusicPlayerScreenState();
 }
 
+//==============================================================================
+//==============================================================================
+
 class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   late AudioPlayer _audioPlayer;
   late int _currentIndex;
   bool _isPlaying = false;
   bool _isLooping = false;
-  bool _isFavorite = false;
+  bool _isFavorite = false; ///Biến để check xem bài hát đó có trong ds love hay chưa
 
   final SongRepository _songRepository = SongRepository();
   final ArtistRepository _artistRepository = ArtistRepository();
@@ -38,6 +42,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
   Song get currentSong => widget.songs[_currentIndex];
 
+  ///Tạo player phát nhạc
   @override
   void initState() {
     super.initState();
@@ -47,30 +52,30 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     _playCurrentSong();
   }
 
+
+  ///============================== Xử lý các sự kiện khi hát
   void _setupPlayer() {
-    _audioPlayer.onDurationChanged.listen((d) {
-      setState(() => _duration = d);
-    });
 
-    _audioPlayer.onPositionChanged.listen((p) {
-      setState(() => _position = p);
-    });
+    _audioPlayer.onDurationChanged.listen((d) { setState(() => _duration = d); }); ///Thời lượng thay đổi thì cập nhật
 
-    _audioPlayer.onPlayerComplete.listen((event) {
-      if (_isLooping) {
+    _audioPlayer.onPositionChanged.listen((p) { setState(() => _position = p); }); ///Vị trí phát thay đổi thì cập nhật
+
+    _audioPlayer.onPlayerComplete.listen((event) { ///Nếu hết bài
+      if (_isLooping) { //có thì lặp lại
         _playCurrentSong();
-      } else {
+      } else { //ko thì phát tiếp
         _playNext();
       }
     });
   }
 
+  ///============================== Phat bai hat hien tại
   Future<void> _playCurrentSong() async {
     await _audioPlayer.stop();
     await _audioPlayer.play(UrlSource(currentSong.fileUrl));
     setState(() => _isPlaying = true);
     await _checkIfFavorite();
-    await _loadArtistName(); // Gọi để hiển thị tên nghệ sĩ
+    await _loadArtistName(); // Gọi để hiển thị tên ca si
   }
 
   Future<void> _loadArtistName() async {
@@ -86,6 +91,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     }
   }
 
+  ///================================ Kiểm tra bài hát đó có trong danh sách yêu thích chưa để set trái tim
+
   Future<void> _checkIfFavorite() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
@@ -100,6 +107,10 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     }
   }
 
+  ///===========================================================================
+  /// Mấy cái nút
+
+  /// Play - Páue
   void _togglePlayPause() {
     if (_isPlaying) {
       _audioPlayer.pause();
@@ -111,10 +122,12 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     });
   }
 
+  ///Vòng lặp
   void _toggleLoop() {
     setState(() => _isLooping = !_isLooping);
   }
 
+  ///Thêm xóa bài hát vào yêu thích
   void _toggleFavorite() async {
     try {
       if (_isFavorite) {
@@ -131,6 +144,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     }
   }
 
+  ///Chuyển tiếp - lùyi
   void _playNext() {
     if (_currentIndex < widget.songs.length - 1) {
       _currentIndex++;
@@ -145,12 +159,14 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     }
   }
 
+  ///Nếu thóoát thì xóa bộ nhớ phát nhạc để tránh tràn bộ nhớ
   @override
   void dispose() {
     _audioPlayer.dispose();
     super.dispose();
   }
 
+  /// Chỉnh thời gian giây thành phút
   String _formatDuration(Duration d) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     final minutes = twoDigits(d.inMinutes.remainder(60));
@@ -158,17 +174,23 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     return "$minutes:$seconds";
   }
 
+  ///===========================================================================
+  ///===========================================================================
+  ///===========================================================================
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(currentSong.name),
-      ),
+      appBar: AppBar( title: Text(currentSong.name),),
+
       body: Padding(
         padding: const EdgeInsets.all(20),
+
         child: Column(
           children: [
             const SizedBox(height: 30),
+
+            ///Hình của bài nhạc
             ClipOval(
               child: Image.network(
                 currentSong.imageUrl,
@@ -184,20 +206,23 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               ),
             ),
             const SizedBox(height: 20),
+
+            ///Thông tin bài nhạc
             Text(currentSong.name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            Text("Nghệ sĩ: ${_artistName ?? 'Đang tải...'}", style: const TextStyle(fontSize: 16, color: Colors.grey)),
+            Text("Ca sĩ: ${_artistName ?? 'Đang tải...'}", style: const TextStyle(fontSize: 16, color: Colors.grey)),
             Text("Phát hành: ${currentSong.formattedReleaseDate}", style: const TextStyle(fontSize: 16, color: Colors.grey)),
 
+            ///Cái thanh thời gian
             Slider(
-              value: _position.inSeconds.toDouble(),
+              value: _position.inSeconds.toDouble(), ///Time hiện tại
               min: 0,
-              max: _duration.inSeconds.toDouble(),
-              onChanged: (value) {
+              max: _duration.inSeconds.toDouble(), ///Tổng time bài hát
+              onChanged: (value) { ///Chuyn nhạc đên thời gian tương ứng
                 final position = Duration(seconds: value.toInt());
                 _audioPlayer.seek(position);
               },
             ),
-            Row(
+            Row( ///Giá trị thời gian đầu cuoois - Chỉ hiện để user nhận biết
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(_formatDuration(_position)),
@@ -205,10 +230,12 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               ],
             ),
 
+            ///Mấy cái nút
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+
                 IconButton(
                   icon: Icon(
                     _isLooping ? Icons.repeat_one : Icons.repeat,
@@ -216,21 +243,25 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                   ),
                   onPressed: _toggleLoop,
                 ),
+
                 IconButton(
                   icon: const Icon(Icons.skip_previous),
                   iconSize: 36,
                   onPressed: _playPrevious,
                 ),
+
                 IconButton(
                   icon: Icon(_isPlaying ? Icons.pause_circle : Icons.play_circle),
                   iconSize: 64,
                   onPressed: _togglePlayPause,
                 ),
+
                 IconButton(
                   icon: const Icon(Icons.skip_next),
                   iconSize: 36,
                   onPressed: _playNext,
                 ),
+
                 IconButton(
                   icon: Icon(
                     _isFavorite ? Icons.favorite : Icons.favorite_border,
@@ -238,9 +269,15 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                   ),
                   onPressed: _toggleFavorite,
                 ),
+
               ],
+
             ),
+
+
           ],
+
+
         ),
       ),
     );

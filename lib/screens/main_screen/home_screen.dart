@@ -23,20 +23,25 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async => await _showExitConfirmation(context), //chặn thoát màn hình khi bấm quay lại (chỉ có ở home)
+
       child: MainLayout(
+
         title: "Trang chủ",
         body: RefreshIndicator(
+
           onRefresh: () async {
             context.read<SongBloc>().add(LoadSongs()); // Load danh sách bài hát
             context.read<AlbumBloc>().add(LoadAlbums()); // Load danh sách album
             context.read<ArtistBloc>().add(LoadArtists()); // Load danh sách nghệ sĩ
           },
+
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(8.0),
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
                 SectionTitle(title: "Bài hát đề xuất"),
                 SongList(event: LoadSongs()), // Hiển thị danh sách bài hát
 
@@ -53,9 +58,13 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
+
+
     );
+
   }
 
+  ///Xử lý khi bấm back
   Future<bool> _showExitConfirmation(BuildContext context) async {
     return await showDialog(
       context: context,
@@ -76,4 +85,6 @@ class HomeScreen extends StatelessWidget {
     ) ??
         false;
   }
+
+
 }

@@ -11,7 +11,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold)),
       backgroundColor: Colors.green,
       leading: IconButton(
-        icon: const Icon(Icons.dashboard, color: Colors.white, size: 30), // Đổi icon ở đây
+        icon: const Icon(Icons.dashboard, color: Colors.white, size: 30), // Đổi icon
         onPressed: () {
           Scaffold.of(context).openDrawer(); // Mở Navbar khi bấm
         },

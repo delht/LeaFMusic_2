@@ -13,13 +13,18 @@ class SongBloc extends Bloc<SongEvent, SongState> {
     on<LoadSongsFromFavorite>(_onLoadSongsFromFavorite);
   }
 
-  void _onLoadSongs(LoadSongs event, Emitter<SongState> emit) async {
+
+  // ============================================================================
+  ///emit(xxx): thông báo trạng thái cho UI
+  ///UI gọi → Bloc nhận event → gọi repository → trả dữ liệu hoặc lỗi → UI nhận state và hiển thị
+
+  void _onLoadSongs(LoadSongs event, Emitter<SongState> emit) async { ///Đăng ký sự kiện
     emit(SongLoading());
     try {
-      final songs = await songRepository.fetchSongsRandom();
-      emit(SongLoaded(songs));
+      final songs = await songRepository.fetchSongsRandom(); ///Lấy data từ api repo
+      emit(SongLoaded(songs)); ///Trả data về giao diện thông qua trạng thái
     } catch (e) {
-      emit(SongError("Lấy dữ liệu bài hát random thất bại"));
+      emit(SongError("Lấy dữ liệu bài hát random thất bại")); ///Lỗi
     }
   }
 

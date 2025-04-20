@@ -9,20 +9,27 @@ import 'package:leafmusic_2/screens/details/album_detail_screen.dart';
 class AlbumList extends StatelessWidget {
   // const AlbumList({super.key});
 
-  final AlbumEvent event;
+  final AlbumEvent event; ///event trạng thái
+
   const AlbumList({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AlbumBloc, AlbumState>(
       builder: (context, state) {
-        if (state is AlbumInitial) {
+
+        if (state is AlbumInitial) { ///Trạng thái ban đầu
+
           // context.read<AlbumBloc>().add(LoadAlbums());
           context.read<AlbumBloc>().add(event);
           return const Center(child: CircularProgressIndicator());
-        } else if (state is AlbumLoading) {
+
+        } else if (state is AlbumLoading) { ///Trạng thái đang tải data
+
           return const Center(child: CircularProgressIndicator());
-        } else if (state is AlbumError) {
+
+        } else if (state is AlbumError) { ///Trạng thái lỗi
+
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -33,7 +40,9 @@ class AlbumList extends StatelessWidget {
               ),
             ),
           );
-        } else if (state is AlbumLoaded) {
+
+        } else if (state is AlbumLoaded) { ///CÓ dữ liệu
+
           List<Album> albums = state.albums;
           return SizedBox(
             height: 250,
@@ -47,9 +56,12 @@ class AlbumList extends StatelessWidget {
               },
             ),
           );
+
         }
+
         return const SizedBox.shrink();
       },
+
     );
   }
 
@@ -57,6 +69,7 @@ class AlbumList extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
+
         onTap: () {
           print("Bạn đã nhấn vào album: ${album.name}");
           Navigator.push(
@@ -68,10 +81,13 @@ class AlbumList extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(10),
         splashColor: Colors.blue.withOpacity(0.3),
+
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Column(
             children: [
+
+
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.network(
@@ -89,7 +105,9 @@ class AlbumList extends StatelessWidget {
                   },
                 ),
               ),
+
               const SizedBox(height: 8),
+
               SizedBox(
                 width: 150,
                 child: Text(
@@ -99,6 +117,8 @@ class AlbumList extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+
+
             ],
           ),
         ),

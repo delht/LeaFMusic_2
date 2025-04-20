@@ -53,7 +53,8 @@ class AlbumListSearch extends StatelessWidget {
       itemCount: albums!.length,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) => _buildAlbumTile(context, albums![index]),
+      itemBuilder: (context, index) => _buildAlbumTile(context, albums![index]), ///Dấu chaasm than để khi mà mảng có null thì vẫn được sử dụng chứ ko crack app
     );
   }
+
 }

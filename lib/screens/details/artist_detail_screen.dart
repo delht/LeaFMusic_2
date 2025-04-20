@@ -72,7 +72,7 @@ class ArtistDetailScreen extends StatelessWidget {
 
 
               Text(
-                "Top 5 bài hát nổi bật",
+                "Các bài hát của " + artist.name,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 5),

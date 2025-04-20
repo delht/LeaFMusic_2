@@ -61,7 +61,7 @@ class RegisterScreen extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6A5FFF), // Màu tím nhạt
+                  backgroundColor: const Color(0xFF6A5FFF),
                   foregroundColor: Colors.white,
                 ),
 
@@ -106,6 +106,7 @@ class RegisterScreen extends StatelessWidget {
                         MaterialPageRoute(builder: (_) => const LoginScreen()),
                             (route) => false,
                       );
+
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

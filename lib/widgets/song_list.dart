@@ -10,13 +10,17 @@ import '../repositories/artist_repository.dart';
 import '../screens/main_screen/music_player_screen.dart';
 
 class SongList extends StatelessWidget {
-  final List<Song>? songs;
-  final SongEvent? event;
+
+  final List<Song>? songs; ///Dùng nếu có sẵn danh sách bài hát
+  final SongEvent? event; ///Nếu nếu truyền sự kiện
 
   const SongList({super.key, this.songs, this.event});
 
   Widget _buildSongTile(BuildContext context, Song song, int index, List<Song> songList) {
+
     return ListTile(
+
+      //Hình bên hông
       leading: ClipRRect(
         borderRadius: BorderRadius.circular(5),
         child: Image.network(
@@ -36,13 +40,14 @@ class SongList extends StatelessWidget {
       ),
       title: Text(song.name),
 
+      //Hiển thị tên ca sĩ thay vì id
       subtitle: FutureBuilder<Artist>(
         future: ArtistRepository().fetchArtistsInfor(song.idArtist),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Text("Đang tải nghệ sĩ...");
+            return const Text("Đang tải ca sĩ...");
           } else if (snapshot.hasError) {
-            return const Text("Không thể tải nghệ sĩ");
+            return const Text("Không thể tải ca sĩ");
           } else {
             final artist = snapshot.data!;
             return Text("${artist.name}");
@@ -50,7 +55,10 @@ class SongList extends StatelessWidget {
         },
       ),
 
+      //Mũi tên bên phải
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+
+
       onTap: () {
         Navigator.push(
           context,
@@ -62,11 +70,14 @@ class SongList extends StatelessWidget {
           ),
         );
       },
+
+
     );
   }
 
   @override
   Widget build(BuildContext context) {
+
     /// TRUYỀN DỮ LIỆU THEO DANH SÁCH CÓ SẴN
     if (songs != null) {
       if (songs!.isEmpty) {
@@ -84,8 +95,9 @@ class SongList extends StatelessWidget {
     /// TRUYỀN DỮ LIỆU THEO EVENT (BLOC)
     return BlocBuilder<SongBloc, SongState>(
       builder: (context, state) {
+
         if (state is SongInitial) {
-          context.read<SongBloc>().add(event!);
+          context.read<SongBloc>().add(event!); ///Lấy data từ sự kiện
           return const Center(child: CircularProgressIndicator());
         } else if (state is SongLoading) {
           return const Center(child: CircularProgressIndicator());

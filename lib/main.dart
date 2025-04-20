@@ -18,10 +18,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
 
+  ///Lưu, chuyển đổi sáng tối
   final themeCubit = ThemeCubit();
   await themeCubit.loadTheme();
 
-  final isLoggedIn = await AuthManager.isLoggedIn();
+  final isLoggedIn = await AuthManager.isLoggedIn(); ///Check đăng nhập
 
   runApp(
     BlocProvider.value(
@@ -40,6 +41,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        ///Tạo các BLOC, sử dụng cho toàn bộ app
+        ///Các Repo để lấy data
         BlocProvider(create: (_) => SongBloc(songRepository: SongRepository())),
         BlocProvider(create: (_) => AlbumBloc(albumRepository: AlbumRepository())),
         BlocProvider(create: (_) => ArtistBloc(artistRepository: ArtistRepository())),

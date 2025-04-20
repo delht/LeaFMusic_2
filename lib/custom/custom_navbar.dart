@@ -41,12 +41,13 @@ class Navbar extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
+
                   children: [
-                    const CircleAvatar(
-                      radius: 30,
-                      backgroundImage: AssetImage("assets/images/leaf.avif"),
-                      backgroundColor: Colors.white,
-                    ),
+                    // const CircleAvatar(
+                    //   radius: 30,
+                    //   backgroundImage: AssetImage("assets/images/leaf.avif"),
+                    //   backgroundColor: Colors.white,
+                    // ),
                     const SizedBox(height: 10),
                     Text(
                       username,
@@ -57,6 +58,8 @@ class Navbar extends StatelessWidget {
                       ),
                     )
                   ],
+
+
                 ),
               );
             },

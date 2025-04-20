@@ -25,6 +25,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
+
         onWillPop: () async {
           Navigator.of(context).pushReplacementNamed('/home');
           return false;
@@ -39,6 +40,7 @@ class _SearchScreenState extends State<SearchScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: 'Nhập từ khóa tìm kiếm...',
@@ -48,16 +50,25 @@ class _SearchScreenState extends State<SearchScreen> {
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.send),
+
+                    ///=========================================================
+
                     onPressed: () {
                       context
                           .read<SearchBloc>()
                           .add(LoadSearch(keyword: _searchController.text));
                     },
+
+                    ///=========================================================
+
                   ),
                 ),
+
+                ///Giá trị gõ vào sẽ đuowjc đem đi truy vấn data
                 onChanged: (query) {
                   context.read<SearchBloc>().add(LoadSearch(keyword: query));
                 },
+
               ),
             ),
 
@@ -74,6 +85,10 @@ class _SearchScreenState extends State<SearchScreen> {
                     var songs = state.result.songs;
                     var artists = state.result.artists;
                     var albums = state.result.albums;
+
+                    if (songs.isEmpty && artists.isEmpty && albums.isEmpty) {
+                      return const Center(child: Text('Không tìm thấy kết quả phù hợp.'));
+                    }
 
                     return SingleChildScrollView(
                       child: Column(

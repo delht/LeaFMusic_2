@@ -26,7 +26,7 @@ class ArtistListSearch extends StatelessWidget {
         ),
       ),
       title: Text(artist.name),
-      subtitle: Text("ID: ${artist.idArtist}"),
+      // subtitle: Text("ID: ${artist.idArtist}"),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
       onTap: () {
 
