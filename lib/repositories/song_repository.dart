@@ -137,4 +137,27 @@ class SongRepository {
 ///===================================================================================
 
 
+  Future<List<Song>> fetchSongsFromCustomList(int idList) async {
+    final response = await http.get(Uri.parse("http://$ip/api/custom-songlists/$idList"));
+    if (response.statusCode == 200) {
+      List data = json.decode(utf8.decode(response.bodyBytes));
+      return data.map((e) => Song.fromJson(e)).toList();
+    } else {
+      throw Exception("Lỗi lấy bài hát từ custom list");
+    }
+  }
+
+  Future<void> removeSongFromCustomList(int idList, int idSong) async {
+    final url = Uri.parse("http://$ip/api/custom-songlists/remove?idList=$idList&idSong=$idSong");
+
+    final response = await http.delete(url);
+
+    if (response.statusCode != 200) {
+      throw Exception("Xóa bài hát thất bại");
+    }
+  }
+
+
+
+
 }

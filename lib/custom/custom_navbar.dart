@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:leafmusic_2/screens/main_screen/account_screen.dart';
+import 'package:leafmusic_2/screens/main_screen/custom_list_screen.dart';
 import 'package:leafmusic_2/screens/main_screen/favorite_list_screen.dart';
 import '../core/auth_manager.dart';
 import '../screens/main_screen/home_screen.dart';
@@ -94,6 +95,16 @@ class Navbar extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (context) => const FavoriteListScreen()),
+              );
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.list, color: Colors.blue, size: 30),
+            title: const Text("Danh sách phát cá nhân"),
+            onTap: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const CustomListScreen()),
               );
             },
           ),
