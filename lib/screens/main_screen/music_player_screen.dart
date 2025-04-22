@@ -188,12 +188,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
       appBar: AppBar(
         title: Text(currentSong.name),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.playlist_add),
-            onPressed: _showAddToCustomListDialog,
-          ),
-        ],
       ),
 
 
@@ -276,13 +270,22 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                   onPressed: _playNext,
                 ),
 
-                IconButton(
-                  icon: Icon(
-                    _isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: _isFavorite ? Colors.red : Colors.grey,
-                  ),
-                  onPressed: _toggleFavorite,
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        _isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: _isFavorite ? Colors.red : Colors.grey,
+                      ),
+                      onPressed: _toggleFavorite,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.playlist_add),
+                      onPressed: _showAddToCustomListDialog,
+                    ),
+                  ],
                 ),
+
 
               ],
 
@@ -314,7 +317,18 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       return;
     }
 
-    int? selectedListId;
+    // Khởi tạo Map: idList => có bài hát không
+    Map<int, bool> selectionMap = {};
+    try {
+      for (final list in lists) {
+        final exists = await customListRepo.checkSongInCustomList(list.idList, currentSong.idSong);
+        selectionMap[list.idList] = exists;
+      }
+    } catch (_) {
+      for (final list in lists) {
+        selectionMap[list.idList] = false;
+      }
+    }
 
     showDialog(
       context: context,
@@ -324,60 +338,56 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
           content: SizedBox(
             height: 300,
             width: double.maxFinite,
-            child: Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: lists.length,
-                    itemBuilder: (context, index) {
-                      final list = lists[index];
-                      return RadioListTile<int>(
-                        title: Text(list.name),
-                        value: list.idList,
-                        groupValue: selectedListId,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedListId = value;
-                          });
-                          Navigator.of(context).pop();
-                          _addSongToCustomList(value!); // Gọi hàm thêm bài hát
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
+            child: StatefulBuilder(
+              builder: (context, setState) {
+                return ListView.builder(
+                  itemCount: lists.length,
+                  itemBuilder: (context, index) {
+                    final list = lists[index];
+                    final isChecked = selectionMap[list.idList] ?? false;
+                    return CheckboxListTile(
+                      title: Text(list.name),
+                      value: isChecked,
+                      onChanged: (value) {
+                        setState(() {
+                          selectionMap[list.idList] = value ?? false;
+                        });
+                      },
+                    );
+                  },
+                );
+              },
             ),
           ),
           actions: [
             TextButton(
-              child: const Text("Đóng"),
+              child: const Text("Hủy"),
               onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text("Lưu"),
+              onPressed: () async {
+                for (final entry in selectionMap.entries) {
+                  final idList = entry.key;
+                  final shouldHave = entry.value;
+                  final alreadyInList = await customListRepo.checkSongInCustomList(idList, currentSong.idSong);
+
+                  if (shouldHave && !alreadyInList) {
+                    await customListRepo.addSongToCustomList(idList, currentSong.idSong);
+                  } else if (!shouldHave && alreadyInList) {
+                    await customListRepo.removeSongFromCustomList(idList, currentSong.idSong);
+                  }
+                }
+
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Cập nhật danh sách thành công")));
+              },
             ),
           ],
         );
       },
     );
   }
-
-
-  Future<void> _addSongToCustomList(int idList) async {
-    final repo = CustomListRepository();
-
-    try {
-      await repo.addSongToCustomList(idList, currentSong.idSong);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Đã thêm vào danh sách")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Lỗi khi thêm bài hát: $e")),
-      );
-    }
-  }
-
-
-
 
 
 

@@ -62,5 +62,24 @@ class CustomListRepository {
   }
 
 
+  Future<bool> checkSongInCustomList(int idList, int idSong) async {
+    final response = await http.get(Uri.parse("http://$ip/api/custom-songlists/contains?idList=$idList&idSong=$idSong"));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['exists'] ?? false;
+    } else {
+      throw Exception("Lỗi kiểm tra bài hát trong danh sách");
+    }
+  }
+
+  Future<void> removeSongFromCustomList(int idList, int idSong) async {
+    final response = await http.delete(Uri.parse('http://$ip/api/custom-songlists/remove?idList=$idList&idSong=$idSong'));
+    if (response.statusCode != 200) {
+      throw Exception('Xóa bài hát khỏi danh sách thất bại');
+    }
+  }
+
+
 
 }
