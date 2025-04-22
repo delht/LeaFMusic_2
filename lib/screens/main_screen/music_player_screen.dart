@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../models/customlist.dart';
 import '../../models/song.dart';
+import '../../repositories/customlist_repository.dart';
 import '../../repositories/song_repository.dart';
 import '../../repositories/artist_repository.dart'; // Thêm dòng này
 import '../../models/artist.dart'; // Thêm dòng này
@@ -51,7 +53,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     _setupPlayer();
     _playCurrentSong();
   }
-
 
   ///============================== Xử lý các sự kiện khi hát
   void _setupPlayer() {
@@ -127,6 +128,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     setState(() => _isLooping = !_isLooping);
   }
 
+  // ==========================================
   ///Thêm xóa bài hát vào yêu thích
   void _toggleFavorite() async {
     try {
@@ -143,6 +145,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       );
     }
   }
+  // ==========================================
 
   ///Chuyển tiếp - lùyi
   void _playNext() {
@@ -181,7 +184,18 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar( title: Text(currentSong.name),),
+      // appBar: AppBar( title: Text(currentSong.name),),
+
+      appBar: AppBar(
+        title: Text(currentSong.name),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.playlist_add),
+            onPressed: _showAddToCustomListDialog,
+          ),
+        ],
+      ),
+
 
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -282,4 +296,89 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       ),
     );
   }
+
+  ///===========================================================================
+
+  Future<void> _showAddToCustomListDialog() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    if (userId == null) return;
+
+    final customListRepo = CustomListRepository();
+    List<CustomList> lists = [];
+
+    try {
+      lists = await customListRepo.fetchCustomList(userId);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
+      return;
+    }
+
+    int? selectedListId;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Thêm vào danh sách"),
+          content: SizedBox(
+            height: 300,
+            width: double.maxFinite,
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: lists.length,
+                    itemBuilder: (context, index) {
+                      final list = lists[index];
+                      return RadioListTile<int>(
+                        title: Text(list.name),
+                        value: list.idList,
+                        groupValue: selectedListId,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedListId = value;
+                          });
+                          Navigator.of(context).pop();
+                          _addSongToCustomList(value!); // Gọi hàm thêm bài hát
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text("Đóng"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  Future<void> _addSongToCustomList(int idList) async {
+    final repo = CustomListRepository();
+
+    try {
+      await repo.addSongToCustomList(idList, currentSong.idSong);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Đã thêm vào danh sách")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Lỗi khi thêm bài hát: $e")),
+      );
+    }
+  }
+
+
+
+
+
+
 }

@@ -49,6 +49,18 @@ class CustomListRepository {
 
   }
 
+  // =====================================
+
+  Future<void> addSongToCustomList(int idList, int idSong) async {
+    final response = await http.post(
+      Uri.parse("http://$ip/api/custom-songlists/add?idList=$idList&idSong=$idSong"),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Không thể thêm bài hát vào danh sách");
+    }
+  }
+
 
 
 }
