@@ -80,6 +80,20 @@ class CustomListRepository {
     }
   }
 
+  // Future<CustomList> createCustomList(String userId, String name) async {
+  //   final response = await http.post(
+  //     Uri.parse('http://$ip/api/customlists/add?name=$name&idUser=$userId'),
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: jsonEncode({'userId': userId, 'name': name}),
+  //   );
+  //
+  //   if (response.statusCode == 201) {
+  //     return CustomList.fromJson(jsonDecode(response.body));
+  //   } else {
+  //     throw Exception('Không thể tạo danh sách mới');
+  //   }
+  // }
+
 
 
 }

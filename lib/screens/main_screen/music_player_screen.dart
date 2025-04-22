@@ -310,14 +310,16 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     final customListRepo = CustomListRepository();
     List<CustomList> lists = [];
 
-    try {
-      lists = await customListRepo.fetchCustomList(userId);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
-      return;
+    Future<void> loadLists() async {
+      try {
+        lists = await customListRepo.fetchCustomList(userId);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
+      }
     }
 
-    // Khởi tạo Map: idList => có bài hát không
+    await loadLists();
+
     Map<int, bool> selectionMap = {};
     try {
       for (final list in lists) {
@@ -333,31 +335,110 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text("Thêm vào danh sách"),
-          content: SizedBox(
-            height: 300,
-            width: double.maxFinite,
-            child: StatefulBuilder(
-              builder: (context, setState) {
-                return ListView.builder(
-                  itemCount: lists.length,
-                  itemBuilder: (context, index) {
-                    final list = lists[index];
-                    final isChecked = selectionMap[list.idList] ?? false;
-                    return CheckboxListTile(
-                      title: Text(list.name),
-                      value: isChecked,
-                      onChanged: (value) {
-                        setState(() {
-                          selectionMap[list.idList] = value ?? false;
-                        });
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              title: const Text("Thêm vào danh sách"),
+              content: SizedBox(
+                height: 350,
+                width: double.maxFinite,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: lists.length,
+                        itemBuilder: (context, index) {
+                          final list = lists[index];
+                          final isChecked = selectionMap[list.idList] ?? false;
+                          return CheckboxListTile(
+                            title: Text(list.name),
+                            value: isChecked,
+                            onChanged: (value) {
+                              setStateDialog(() {
+                                selectionMap[list.idList] = value ?? false;
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextButton.icon(
+                      onPressed: () async {
+                        final newListName = await _showCreateNewListDialog();
+                        if (newListName != null && newListName.trim().isNotEmpty) {
+                          try {
+                            // final newList = await customListRepo.createCustomList(userId, newListName.trim());
+                            // lists.add(newList);
+                            // selectionMap[newList.idList] = true;
+                            // setStateDialog(() {}); // Cập nhật UI
+
+                            await customListRepo.addCustomList(newListName.trim(), userId);
+                            await loadLists(); // Reload lại danh sách sau khi tạo
+                            selectionMap.clear();
+                            for (final list in lists) {
+                              final exists = await customListRepo.checkSongInCustomList(list.idList, currentSong.idSong);
+                              selectionMap[list.idList] = exists;
+                            } // Đánh dấu danh sách mới được tick
+                            final newList = lists.last;
+                            selectionMap[newList.idList] = true;
+                            setStateDialog(() {});
+
+
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Không thể tạo danh sách mới: $e")));
+                          }
+                        }
                       },
-                    );
+                      icon: const Icon(Icons.add),
+                      label: const Text("Tạo danh sách mới"),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: const Text("Hủy"),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                TextButton(
+                  child: const Text("Lưu"),
+                  onPressed: () async {
+                    for (final entry in selectionMap.entries) {
+                      final idList = entry.key;
+                      final shouldHave = entry.value;
+                      final alreadyInList = await customListRepo.checkSongInCustomList(idList, currentSong.idSong);
+
+                      if (shouldHave && !alreadyInList) {
+                        await customListRepo.addSongToCustomList(idList, currentSong.idSong);
+                      } else if (!shouldHave && alreadyInList) {
+                        await customListRepo.removeSongFromCustomList(idList, currentSong.idSong);
+                      }
+                    }
+
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Cập nhật danh sách thành công")));
                   },
-                );
-              },
-            ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<String?> _showCreateNewListDialog() async {
+    String newName = '';
+    return showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Tên danh sách mới"),
+          content: TextField(
+            autofocus: true,
+            decoration: const InputDecoration(hintText: "Nhập tên danh sách"),
+            onChanged: (value) => newName = value,
           ),
           actions: [
             TextButton(
@@ -365,23 +446,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: const Text("Lưu"),
-              onPressed: () async {
-                for (final entry in selectionMap.entries) {
-                  final idList = entry.key;
-                  final shouldHave = entry.value;
-                  final alreadyInList = await customListRepo.checkSongInCustomList(idList, currentSong.idSong);
-
-                  if (shouldHave && !alreadyInList) {
-                    await customListRepo.addSongToCustomList(idList, currentSong.idSong);
-                  } else if (!shouldHave && alreadyInList) {
-                    await customListRepo.removeSongFromCustomList(idList, currentSong.idSong);
-                  }
-                }
-
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Cập nhật danh sách thành công")));
-              },
+              child: const Text("Tạo"),
+              onPressed: () => Navigator.of(context).pop(newName),
             ),
           ],
         );
