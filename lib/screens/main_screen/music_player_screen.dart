@@ -230,6 +230,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                 _audioPlayer.seek(position);
               },
             ),
+
             Row( ///Giá trị thời gian đầu cuoois - Chỉ hiện để user nhận biết
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -291,9 +292,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
             ),
 
-
           ],
-
 
         ),
       ),
@@ -301,14 +300,20 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   }
 
   ///===========================================================================
+  ///===========================================================================
+  ///===========================================================================
 
+  ///Màn hình thêm vào ds custom
   Future<void> _showAddToCustomListDialog() async {
+
+    ///Thông tin người dùng
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     if (userId == null) return;
 
+
     final customListRepo = CustomListRepository();
-    List<CustomList> lists = [];
+    List<CustomList> lists = []; // <= cức các danh sách mà người dùng đã tạo
 
     Future<void> loadLists() async {
       try {
@@ -317,18 +322,20 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
       }
     }
+    // ===========================================================================
 
     await loadLists();
 
-    Map<int, bool> selectionMap = {};
+    ///Xác định bài hát đang có trong danh sách nào
+    Map<int, bool> selectionMap = {}; //selectionMap = { 1: true, 2: false, 3: true }
     try {
       for (final list in lists) {
-        final exists = await customListRepo.checkSongInCustomList(list.idList, currentSong.idSong);
-        selectionMap[list.idList] = exists;
+        final exists = await customListRepo.checkSongInCustomList(list.idList, currentSong.idSong); //API kiểm tra
+        selectionMap[list.idList] = exists; //có thì đánh dấu tích
       }
     } catch (_) {
       for (final list in lists) {
-        selectionMap[list.idList] = false;
+        selectionMap[list.idList] = false; //ko có thì ko đánh dấu
       }
     }
 
@@ -348,9 +355,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                       child: ListView.builder(
                         itemCount: lists.length,
                         itemBuilder: (context, index) {
+
                           final list = lists[index];
-                          final isChecked = selectionMap[list.idList] ?? false;
-                          return CheckboxListTile(
+                          final isChecked = selectionMap[list.idList] ?? false; ///Check xem bài hát đã có trong ds đó chưa, có rồi thì hiện sẵn dấu tích
+
+                          return CheckboxListTile( ///Chọn ds do người dùng chọn
                             title: Text(list.name),
                             value: isChecked,
                             onChanged: (value) {
@@ -363,6 +372,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
+
+                    ///Nút thêm mới ds custom
                     TextButton.icon(
                       onPressed: () async {
                         final newListName = await _showCreateNewListDialog();
@@ -375,11 +386,15 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
                             await customListRepo.addCustomList(newListName.trim(), userId);
                             await loadLists(); // Reload lại danh sách sau khi tạo
+
+                            ///Cập nhật lại ds tíck
                             selectionMap.clear();
                             for (final list in lists) {
                               final exists = await customListRepo.checkSongInCustomList(list.idList, currentSong.idSong);
                               selectionMap[list.idList] = exists;
                             } // Đánh dấu danh sách mới được tick
+
+                            ///Tích ds mới được tạo
                             final newList = lists.last;
                             selectionMap[newList.idList] = true;
                             setStateDialog(() {});
@@ -393,9 +408,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                       icon: const Icon(Icons.add),
                       label: const Text("Tạo danh sách mới"),
                     ),
+
+
                   ],
                 ),
               ),
+
+
               actions: [
                 TextButton(
                   child: const Text("Hủy"),
@@ -404,29 +423,43 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                 TextButton(
                   child: const Text("Lưu"),
                   onPressed: () async {
-                    for (final entry in selectionMap.entries) {
-                      final idList = entry.key;
-                      final shouldHave = entry.value;
+                    for (final entry in selectionMap.entries) { ///selectionMap.entries chứa trang thái checkbox
+                      final idList = entry.key; //Đây là id của ds
+                      final shouldHave = entry.value; //trạng thái
+
+                      //selectionMap = {
+                      //   5: true,
+                      //   6: false,
+                      //   9: true,
+                      // };
+
                       final alreadyInList = await customListRepo.checkSongInCustomList(idList, currentSong.idSong);
 
-                      if (shouldHave && !alreadyInList) {
+                      if (shouldHave && !alreadyInList) { ///đã tisck nhuwnwng chưa có trong ds
                         await customListRepo.addSongToCustomList(idList, currentSong.idSong);
-                      } else if (!shouldHave && alreadyInList) {
+
+                      } else if (!shouldHave && alreadyInList) { ///có rồi nhưng bỏ tích
                         await customListRepo.removeSongFromCustomList(idList, currentSong.idSong);
                       }
                     }
 
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Cập nhật danh sách thành công")));
+
                   },
                 ),
               ],
+
+
             );
+
+
           },
         );
       },
     );
   }
+
 
   Future<String?> _showCreateNewListDialog() async {
     String newName = '';

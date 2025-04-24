@@ -70,6 +70,8 @@ class SongList3 extends StatelessWidget {
       },
 
       onLongPress: () async {
+
+        ///Khai báo dialog
         final confirm = await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(

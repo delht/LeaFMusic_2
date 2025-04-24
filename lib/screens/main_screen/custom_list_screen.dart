@@ -27,6 +27,7 @@ class _CustomListScreenState extends State<CustomListScreen> {
     customlistBloc = CustomlistBloc(customListRepository: CustomListRepository());
   }
 
+  /// Hàm lấy id người dùng và load ds dscustom
   Future<void> _loadUserId() async {
     final prefs = await SharedPreferences.getInstance();
     final id = prefs.getString('userId');
@@ -42,6 +43,8 @@ class _CustomListScreenState extends State<CustomListScreen> {
     await _loadUserId();
   }
 
+  ///======================================================================================
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -49,12 +52,18 @@ class _CustomListScreenState extends State<CustomListScreen> {
         Navigator.of(context).pushReplacementNamed('/home');
         return false;
       },
+
       child: BlocProvider.value(
+
         value: customlistBloc,
+
         child: MainLayout(
+
           title: "Danh sách phát",
           body: BlocBuilder<CustomlistBloc, CustomlistState>(
+
             builder: (context, state) {
+
               if (userId == null || state is CustomListLoading) {
                 return const Center(child: CircularProgressIndicator());
               }
@@ -100,10 +109,15 @@ class _CustomListScreenState extends State<CustomListScreen> {
                             itemCount: customLists.length,
                             itemBuilder: (context, index) {
                               final customList = customLists[index];
+
                               return ListTile(
+
                                 title: Text(customList.name),
                                 leading: const Icon(Icons.music_note),
-                                trailing: PopupMenuButton<String>(
+                                trailing: PopupMenuButton<String>( ///Menu nhỏ khi bấm vào 3 chấm
+                                  // icon: Icon(Icons.more_vert),
+
+                                  ///Hành động khi chọn item
                                   onSelected: (value) {
                                     if (value == 'edit') {
                                       _showEditDialog(customList.idList, customList.name);
@@ -115,19 +129,16 @@ class _CustomListScreenState extends State<CustomListScreen> {
                                     }
                                   },
 
+
+                                  /// Danh sách item
                                   itemBuilder: (context) => [
-                                    const PopupMenuItem(
-                                      value: 'edit',
-                                      child: Text('Sửa'),
-                                    ),
-                                    const PopupMenuItem(
-                                      value: 'delete',
-                                      child: Text('Xoá'),
-                                    ),
+                                    const PopupMenuItem(value: 'edit', child: Text('Sửa'),),
+                                    const PopupMenuItem(value: 'delete', child: Text('Xoá'),),
                                   ],
                                 ),
+
                                 onTap: () {
-                                  // TODO: Mở danh sách bài hát trong customList
+                                  /// Mở danh sách bài hát
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -138,8 +149,12 @@ class _CustomListScreenState extends State<CustomListScreen> {
                                     ),
                                   );
                                 },
+
+
                               );
                             },
+
+
                           ),
                         ),
                       ),
@@ -156,6 +171,9 @@ class _CustomListScreenState extends State<CustomListScreen> {
     );
   }
 
+  ///===============================================================================================
+
+  ///Dialog Thêm
   void _showAddCustomListDialog() {
     final controller = TextEditingController();
 
@@ -189,6 +207,7 @@ class _CustomListScreenState extends State<CustomListScreen> {
     );
   }
 
+  ///Dialog sửa
   void _showEditDialog(int idList, String oldName) {
     final controller = TextEditingController(text: oldName);
     showDialog(
@@ -222,8 +241,6 @@ class _CustomListScreenState extends State<CustomListScreen> {
       ),
     );
   }
-
-
 
 
 

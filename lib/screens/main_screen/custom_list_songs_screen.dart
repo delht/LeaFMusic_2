@@ -25,6 +25,7 @@ class CustomListSongsScreen extends StatefulWidget {
 class _CustomListSongsScreenState extends State<CustomListSongsScreen> {
   late final SongBloc songBloc;
 
+  ///Hành động khi load lần đầu
   @override
   void initState() {
     super.initState();
@@ -44,11 +45,13 @@ class _CustomListSongsScreenState extends State<CustomListSongsScreen> {
         title: widget.name,
         body: BlocBuilder<SongBloc, SongState>(
           builder: (context, state) {
+
             if (state is SongLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is SongError) {
               return Center(child: Text("Lỗi: ${state.message}"));
             } else if (state is SongLoaded) {
+
               return Padding(
                 padding: const EdgeInsets.only(top: 10, bottom: 70),
                 child: Column(
@@ -65,7 +68,7 @@ class _CustomListSongsScreenState extends State<CustomListSongsScreen> {
                             SongList3(
                               event: LoadSongsFromCustomList(widget.idList),
                               songs: state.songs,
-                              idList: widget.idList, // để dùng cho việc xoá
+                              idList: widget.idList, /// để dùng cho việc xoá
                             ),
                           ],
                         ),
@@ -74,6 +77,9 @@ class _CustomListSongsScreenState extends State<CustomListSongsScreen> {
                   ],
                 ),
               );
+
+
+
             }
 
             return const Center(child: Text("Danh sách sẽ được hiển thị ở đây"));
