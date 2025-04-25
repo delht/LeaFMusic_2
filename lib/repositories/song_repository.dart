@@ -158,6 +158,35 @@ class SongRepository {
   }
 
 
+///===================================================================================
+
+  Future<List<Song>> fetchSuggestedSongs({
+    required List<int> artistIds,
+    required List<int> genreIds,
+  }) async {
+    final response = await http.post(
+      Uri.parse("http://$ip/api/songs/suggest"),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'artistIds': artistIds,
+        'genreIds': genreIds,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+      return data.map((json) => Song.fromJson(json)).toList();
+    } else {
+      throw Exception("Lấy dữ liệu bài hát gợi ý thất bại");
+    }
+  }
+
+
+
+
+
+
+
 
 
 }

@@ -7,6 +7,7 @@ import 'package:leafmusic_2/repositories/search_repository.dart';
 import 'package:leafmusic_2/screens/account/login_screen.dart';
 import 'package:leafmusic_2/screens/main_screen/custom_list_screen.dart';
 import 'package:leafmusic_2/screens/main_screen/home_screen.dart';
+import 'bloc/suggest/suggest_bloc.dart';
 import 'bloc/theme/theme_cubit.dart';
 import 'bloc/song/song_bloc.dart';
 import 'bloc/album/album_bloc.dart';
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => AlbumBloc(albumRepository: AlbumRepository())),
         BlocProvider(create: (_) => ArtistBloc(artistRepository: ArtistRepository())),
         BlocProvider(create: (_) => SearchBloc(searchRepository: SearchRepository())),
+        BlocProvider(create: (_) => SuggestBloc(songRepository: SongRepository())),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {

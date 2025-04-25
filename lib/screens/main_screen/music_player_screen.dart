@@ -41,6 +41,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   Duration _position = Duration.zero;
 
   String? _artistName;
+  String? _genreName;
 
   Song get currentSong => widget.songs[_currentIndex];
 
@@ -71,12 +72,17 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   }
 
   ///============================== Phat bai hat hien tại
+
+  // Todo: MAYBE chỗ này làm lưu id bài hát ====================================
   Future<void> _playCurrentSong() async {
     await _audioPlayer.stop();
     await _audioPlayer.play(UrlSource(currentSong.fileUrl));
     setState(() => _isPlaying = true);
     await _checkIfFavorite();
     await _loadArtistName(); // Gọi để hiển thị tên ca si
+    await _loadGenreName();
+
+    await _updateSuggestionData();
   }
 
   Future<void> _loadArtistName() async {
@@ -88,6 +94,19 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
     } catch (e) {
       setState(() {
         _artistName = 'Không rõ';
+      });
+    }
+  }
+
+  Future<void> _loadGenreName() async {
+    try {
+      final genre = await _artistRepository.fetchGenresInfor(currentSong.idGenre);
+      setState(() {
+        _genreName = genre.name;
+      });
+    } catch (e) {
+      setState(() {
+        _genreName = 'Không rõ';
       });
     }
   }
@@ -185,11 +204,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       // appBar: AppBar( title: Text(currentSong.name),),
-
-      appBar: AppBar(
-        title: Text(currentSong.name),
-      ),
-
+      appBar: AppBar(title: Text(currentSong.name),),
 
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -218,6 +233,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             ///Thông tin bài nhạc
             Text(currentSong.name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             Text("Ca sĩ: ${_artistName ?? 'Đang tải...'}", style: const TextStyle(fontSize: 16, color: Colors.grey)),
+            Text("Thể loại: ${_genreName ?? 'Đang tải...'}", style: const TextStyle(fontSize: 16, color: Colors.grey)),
             Text("Phát hành: ${currentSong.formattedReleaseDate}", style: const TextStyle(fontSize: 16, color: Colors.grey)),
 
             ///Cái thanh thời gian
@@ -487,6 +503,47 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
       },
     );
   }
+
+  ///===========================================================================
+
+  Future<void> _updateSuggestionData() async {
+    final prefs = await SharedPreferences.getInstance(); //Lấy share để lưu data
+
+    /// Lấy danh sách hiện tại đang có trong share
+    List<String> artistIds = prefs.getStringList('recent_artist_ids') ?? [];
+    List<String> genreIds = prefs.getStringList('recent_genre_ids') ?? [];
+
+    /// Lấy id ca sĩ, id thể loại của bài hát đang phát
+    final currentArtistId = currentSong.idArtist.toString();
+    final currentGenreId = currentSong.idGenre.toString();
+
+    /// Nếu id đã có trong ds thì xóa đi để thêm lại từ đầu
+    artistIds.remove(currentArtistId);
+    genreIds.remove(currentGenreId);
+
+    /// Thêm mới vào đầu danh sách
+    artistIds.insert(0, currentArtistId);
+    genreIds.insert(0, currentGenreId);
+
+    /// Giới hạn tối đa 2 phần tử
+    if (artistIds.length > 2) artistIds = artistIds.sublist(0, 2);
+    if (genreIds.length > 2) genreIds = genreIds.sublist(0, 2);
+
+    /// Lưu lại
+    await prefs.setStringList('recent_artist_ids', artistIds);
+    await prefs.setStringList('recent_genre_ids', genreIds);
+
+    /// Debug
+
+    print('\x1B[31m================= ID CA SI: $currentArtistId\x1B[0m');
+    print('\x1B[31m================= ID THE LOAI: $currentGenreId\x1B[0m');
+
+
+    print('\x1B[32m================= ID CA SI DA LUU: $artistIds\x1B[0m');
+    print('\x1B[32m================= ID THE LOAI DA LUU: $genreIds\x1B[0m');
+  }
+
+
 
 
 

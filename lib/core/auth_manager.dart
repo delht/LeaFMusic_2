@@ -32,6 +32,9 @@ class AuthManager {
     await prefs.remove('username');
     await prefs.remove('email');
 
+    await prefs.remove('recent_artist_ids');
+    await prefs.remove('recent_genre_ids');
+
   }
 
   // ===========================================================================
