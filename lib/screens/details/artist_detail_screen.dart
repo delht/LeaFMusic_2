@@ -9,6 +9,9 @@ import 'package:leafmusic_2/repositories/song_repository.dart';
 import 'package:leafmusic_2/widgets/album_list.dart';
 import 'package:leafmusic_2/widgets/song_list.dart';
 
+import '../../bloc/album/album_bloc.dart';
+import '../../repositories/album_repository.dart';
+
 class ArtistDetailScreen extends StatelessWidget {
   final Artist artist;
 
@@ -17,22 +20,21 @@ class ArtistDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return BlocProvider(
-      create: (_) => SongBloc(songRepository: SongRepository()),
-
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => SongBloc(songRepository: SongRepository())),
+        BlocProvider(create: (_) => AlbumBloc(albumRepository: AlbumRepository())),
+      ],
       child: MainLayout(
-
         title: "Ca sĩ ${artist.name}",
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
           physics: const AlwaysScrollableScrollPhysics(),
-
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
 
-              //HÌNH ẢNH, TÊN
+              // Avatar + Tên
               Center(
                 child: Column(
                   children: [
@@ -62,6 +64,7 @@ class ArtistDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
+              // Danh sách album
               Text(
                 "Danh sách album",
                 style: Theme.of(context).textTheme.titleLarge,
@@ -70,19 +73,19 @@ class ArtistDetailScreen extends StatelessWidget {
               AlbumList(event: LoadAlbumByArtist(artist.idArtist)),
               const SizedBox(height: 8),
 
-
+              // Các bài hát
               Text(
-                "Các bài hát của " + artist.name,
+                "Các bài hát của ${artist.name}",
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 5),
               SongList(event: LoadTop5SongsByArtist(artist.idArtist)),
               const SizedBox(height: 8),
-
             ],
           ),
         ),
       ),
     );
+
   }
 }

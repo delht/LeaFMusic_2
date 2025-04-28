@@ -48,3 +48,8 @@ class DeleteCustomList extends CustomlistEvent {
   List<Object> get props => [idList, idUser];
 }
 
+
+// ====================================================================
+
+class LoadCustomlistsPublic extends CustomlistEvent {}
+

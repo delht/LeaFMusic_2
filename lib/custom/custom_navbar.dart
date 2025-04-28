@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:leafmusic_2/screens/main_screen/account_screen.dart';
 import 'package:leafmusic_2/screens/main_screen/custom_list_screen.dart';
 import 'package:leafmusic_2/screens/main_screen/favorite_list_screen.dart';
+import '../screens/main_screen/PublicAlbum.dart';
 import '../core/auth_manager.dart';
 import '../screens/main_screen/home_screen.dart';
 import '../screens/main_screen/settings_screen.dart';
@@ -109,6 +110,21 @@ class Navbar extends StatelessWidget {
             },
           ),
 
+          ///===================================================================
+          ListTile(
+            leading: const Icon(Icons.public, color: Colors.green, size: 30),
+            title: const Text("ABUM PUBLIC"),
+            onTap: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const Publicalbum()),
+              );
+            },
+          ),
+
+
+
+
+          /// ==================================================================
 
           const Divider(thickness: 1, height: 20),
 

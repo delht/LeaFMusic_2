@@ -118,7 +118,7 @@ class _CustomListScreenState extends State<CustomListScreen> {
                                   // icon: Icon(Icons.more_vert),
 
                                   ///Hành động khi chọn item
-                                  onSelected: (value) {
+                                  onSelected: (value) async {
                                     if (value == 'edit') {
                                       _showEditDialog(customList.idList, customList.name);
                                     } else if (value == 'delete') {
@@ -126,6 +126,18 @@ class _CustomListScreenState extends State<CustomListScreen> {
                                         idList: customList.idList,
                                         idUser: userId!,
                                       ));
+                                    } else if (value == 'public') {
+                                      try {
+                                        await CustomListRepository().togglePublicStatus(customList.idList);
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Cập nhật trạng thái công khai thành công')),
+                                        );
+                                        _onRefresh(); // Refresh lại danh sách
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Lỗi: ${e.toString()}')),
+                                        );
+                                      }
                                     }
                                   },
 
@@ -134,6 +146,8 @@ class _CustomListScreenState extends State<CustomListScreen> {
                                   itemBuilder: (context) => [
                                     const PopupMenuItem(value: 'edit', child: Text('Sửa'),),
                                     const PopupMenuItem(value: 'delete', child: Text('Xoá'),),
+                                    const PopupMenuItem(value: 'public', child: Text('Công khai')),
+
                                   ],
                                 ),
 

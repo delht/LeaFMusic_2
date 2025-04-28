@@ -18,6 +18,21 @@ class CustomListRepository {
     }
   }
 
+  /// ==============================================================================
+
+  Future<List<CustomList>> fetchCustomListPublic() async {
+    final response = await http.get(Uri.parse("http://$ip/api/customlists/public"));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+      return data.map((json) => CustomList.fromJson(json)).toList();
+    } else {
+      throw Exception("Lấy dữ liệu danh sách thất bại");
+    }
+  }
+
+  /// ==============================================================================
+
   Future<void> addCustomList(String name, String idUser) async {
     final response = await http.post(
       Uri.parse("http://$ip/api/customlists/add?name=$name&idUser=$idUser"),
@@ -94,6 +109,28 @@ class CustomListRepository {
   //   }
   // }
 
+///============================================================================
+
+  Future<void> togglePublicStatus(int idList) async {
+    final response = await http.put(
+      Uri.parse('http://$ip/api/customlists/public/$idList'),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Không thể thay đổi trạng thái công khai');
+    }
+  }
+
+
+  Future<void> clone(int idList, String idUser) async {
+    final response = await http.post(
+      Uri.parse("http://$ip/api/customlists/clone?idList=$idList&idUser=$idUser"),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Clone thất bại");
+    }
+  }
 
 
 }

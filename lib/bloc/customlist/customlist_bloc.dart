@@ -14,6 +14,8 @@ class CustomlistBloc extends Bloc<CustomlistEvent, CustomlistState> {
     on<UpdateCustomList>(_onUpdateCustomList);
     on<DeleteCustomList>(_onDeleteCustomList);
 
+    on<LoadCustomlistsPublic>(_onLoadCustomListPublic);
+
   }
 
 
@@ -56,5 +58,16 @@ class CustomlistBloc extends Bloc<CustomlistEvent, CustomlistState> {
     }
   }
 
+  //=================================================================
+
+  void _onLoadCustomListPublic(LoadCustomlistsPublic event, Emitter<CustomlistState> emit) async {
+    emit(CustomListLoading());
+    try {
+      final customlists = await customListRepository.fetchCustomListPublic();
+      emit(CustomListLoaded(customlists));
+    } catch (e) {
+      emit(CustomListError("Lấy dữ liệu danh sách public thất bại"));
+    }
+  }
 
 }

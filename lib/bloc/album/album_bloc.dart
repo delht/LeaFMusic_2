@@ -24,7 +24,7 @@ class AlbumBloc extends Bloc<AlbumEvent, AlbumState> {
   void _onLoadAlbumsByArtist(LoadAlbumByArtist event, Emitter<AlbumState> emit) async {
     emit(AlbumLoading());
     try {
-      final albums = await albumRepository.fetchAlbums();
+      final albums = await albumRepository.fetchAlbumsByArtist(event.id_artist);
       emit(AlbumLoaded(albums));
     } catch (e) {
       emit(AlbumError("Không thể tải album"));
