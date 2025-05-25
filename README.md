@@ -1,16 +1,24 @@
-# leafmusic_2
+### 1. Cài đặt thư viện
 
-A new Flutter project.
+```bash
+flutter pub get
+```
 
-## Getting Started
+### 2. Tạo file cấu hình môi trường
 
-This project is a starting point for a Flutter application.
+Tạo file `.env` ở thư mục gốc dự án (cùng cấp với pubspec.yaml) với nội dung ví dụ như sau:
 
-A few resources to get you started if this is your first Flutter project:
+```
+IPv4=xxx.xxx.xxx.xxx
+port=8080
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- `IPv4`: Địa chỉ IP của server backend (API)
+- `port`: Cổng backend (mặc định 8080 hoặc theo cấu hình server //Thường chạy trên local mới có)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+### 3. Chạy ứng dụng
+
+```bash
+flutter run
+```
